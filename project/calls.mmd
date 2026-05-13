@@ -1,0 +1,37 @@
+flowchart LR
+    subgraph weekly_checkers
+        weekly__checkers__base__BaseChecker____init__["__init__"]
+    end
+    subgraph weekly_cli
+        weekly__cli__scan["scan"]
+        weekly__cli__analyze["analyze"]
+        weekly__cli___parse_since_date["_parse_since_date"]
+    end
+    subgraph weekly_core
+        weekly__core__analyzer__analyze_project["analyze_project"]
+        weekly__core__logger__get_logger["get_logger"]
+    end
+    subgraph weekly_git_report
+        weekly__generate_llm_report["generate_llm_report"]
+        weekly__generate_markdown_report["generate_markdown_report"]
+        weekly__generate_html_report["generate_html_report"]
+        weekly___render_summary_report["_render_summary_report"]
+        weekly___render_repo_report["_render_repo_report"]
+        weekly___render_html_template["_render_html_template"]
+        weekly__generate_summary_report["generate_summary_report"]
+    end
+    subgraph weekly_git_scanner
+        weekly___generate_summary_report["_generate_summary_report"]
+        weekly___generate_repo_report["_generate_repo_report"]
+    end
+    weekly__cli__analyze --> weekly__core__analyzer__analyze_project
+    weekly__cli__scan --> weekly__cli___parse_since_date
+    weekly__checkers__base__BaseChecker____init__ --> weekly__core__logger__get_logger
+    weekly__generate_html_report --> weekly__generate_markdown_report
+    weekly__generate_html_report --> weekly__generate_llm_report
+    weekly__generate_html_report --> weekly___render_html_template
+    weekly__generate_summary_report --> weekly___render_html_template
+    weekly___render_html_template --> weekly___render_repo_report
+    weekly___render_html_template --> weekly___render_summary_report
+    weekly___generate_repo_report --> weekly__generate_html_report
+    weekly___generate_summary_report --> weekly__generate_summary_report

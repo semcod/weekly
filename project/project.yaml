@@ -1,0 +1,556 @@
+version: '1'
+project:
+  name: weekly
+  repo: /home/tom/github/wronai/weekly
+  language: python
+  analyzed_at: '2026-03-08T07:10:58Z'
+  tool: code2llm
+  stats:
+    files: 17
+    lines: 6251
+    functions: 99
+    classes: 22
+health:
+  cc_avg: 7.6
+  critical_count: 27
+  critical_limit: 10
+  duplicates: 0
+  cycles: 0
+  alerts:
+  - type: cc_exceeded
+    target: DependenciesChecker._get_dependencies
+    value: 54
+    limit: 15
+    severity: critical
+  - type: cc_exceeded
+    target: GitReportGenerator.generate_llm_report
+    value: 48
+    limit: 15
+    severity: critical
+  - type: cc_exceeded
+    target: CodeQualityChecker._find_common_issues
+    value: 39
+    limit: 15
+    severity: critical
+  - type: high_fan_out
+    target: GitReportGenerator.generate_llm_report
+    value: 33
+    limit: 10
+    severity: critical
+  - type: high_fan_out
+    target: GitScanner._generate_repo_report
+    value: 32
+    limit: 10
+    severity: critical
+  - type: cc_exceeded
+    target: GitScanner._generate_repo_report
+    value: 31
+    limit: 15
+    severity: critical
+  - type: high_fan_out
+    target: GitScanner.scan_repo
+    value: 30
+    limit: 10
+    severity: critical
+  - type: high_fan_out
+    target: CodeQualityChecker._find_common_issues
+    value: 26
+    limit: 10
+    severity: critical
+  - type: high_fan_out
+    target: GitScanner.scan_all
+    value: 19
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: analyze
+    value: 18
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: GitChangeAnalyzer.get_commits_since
+    value: 16
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: GitReportGenerator.generate_markdown_report
+    value: 16
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: scan
+    value: 15
+    limit: 10
+    severity: error
+  - type: high_fan_out
+    target: analyze_project
+    value: 15
+    limit: 10
+    severity: error
+  - type: cc_exceeded
+    target: CodeQualityChecker.check
+    value: 18
+    limit: 15
+    severity: warning
+  - type: cc_exceeded
+    target: CIChecker._detect_cd_config
+    value: 15
+    limit: 15
+    severity: warning
+  - type: cc_exceeded
+    target: ReleaseReadinessChecker._check_version_consistency
+    value: 15
+    limit: 15
+    severity: warning
+  - type: cc_exceeded
+    target: DocumentationChecker.check
+    value: 15
+    limit: 15
+    severity: warning
+  - type: cc_exceeded
+    target: DocumentationChecker._detect_license_type
+    value: 15
+    limit: 15
+    severity: warning
+  - type: cc_exceeded
+    target: GitRepo.__post_init__
+    value: 15
+    limit: 15
+    severity: warning
+modules:
+- path: weekly/checkers/dependencies.py
+  lines: 366
+  classes: 1
+  methods: 7
+  cc_max: 54
+  inbound_deps: 0
+  exports:
+  - name: DependenciesChecker
+    type: class
+    cc_avg: 13.4
+    methods:
+    - name: check
+      cc: 10
+    - name: _get_dependencies
+      cc: 54
+      flag: split
+      fan_out: 12
+    - name: _run_pip_audit
+      cc: 10
+- path: weekly/git_report.py
+  lines: 922
+  classes: 2
+  methods: 7
+  cc_max: 48
+  inbound_deps: 0
+  exports:
+  - name: RepoInfo
+    type: class
+    cc_avg: 0.0
+  - name: GitReportGenerator
+    type: class
+    cc_avg: 12.6
+    methods:
+    - name: generate_llm_report
+      cc: 48
+      flag: split
+      fan_out: 33
+    - name: generate_markdown_report
+      cc: 11
+      fan_out: 16
+    - name: generate_html_report
+      cc: 4
+      fan_out: 14
+    - name: _render_html_template
+      cc: 4
+      fan_out: 10
+    - name: _render_repo_report
+      cc: 14
+- path: weekly/checkers/code_quality.py
+  lines: 343
+  classes: 1
+  methods: 6
+  cc_max: 39
+  inbound_deps: 0
+  exports:
+  - name: CodeQualityChecker
+    type: class
+    cc_avg: 15.8
+    methods:
+    - name: check
+      cc: 18
+      flag: split
+      fan_out: 11
+    - name: _detect_formatters
+      cc: 14
+    - name: _detect_linters
+      cc: 14
+    - name: _find_common_issues
+      cc: 39
+      flag: split
+      fan_out: 26
+- path: weekly/git_scanner.py
+  lines: 638
+  classes: 3
+  methods: 12
+  cc_max: 31
+  inbound_deps: 0
+  exports:
+  - name: GitRepo
+    type: class
+    cc_avg: 7.2
+    methods:
+    - name: __post_init__
+      cc: 15
+      flag: split
+    - name: _extract_metadata
+      cc: 10
+  - name: ScanResult
+    type: class
+    cc_avg: 3.5
+  - name: GitScanner
+    type: class
+    cc_avg: 12.3
+    methods:
+    - name: find_git_repos
+      cc: 13
+      fan_out: 13
+    - name: scan_repo
+      cc: 8
+      fan_out: 30
+    - name: scan_all
+      cc: 7
+      fan_out: 19
+    - name: _generate_repo_report
+      cc: 31
+      flag: split
+      fan_out: 32
+    - name: _generate_summary_report
+      cc: 13
+      fan_out: 14
+- path: weekly/checkers/ci_cd.py
+  lines: 236
+  classes: 1
+  methods: 4
+  cc_max: 15
+  inbound_deps: 0
+  exports:
+  - name: CIChecker
+    type: class
+    cc_avg: 10.5
+    methods:
+    - name: _detect_cd_config
+      cc: 15
+      flag: split
+    - name: _has_testing_in_ci
+      cc: 11
+- path: weekly/checkers/docs.py
+  lines: 242
+  classes: 1
+  methods: 8
+  cc_max: 15
+  inbound_deps: 0
+  exports:
+  - name: DocumentationChecker
+    type: class
+    cc_avg: 6.6
+    methods:
+    - name: check
+      cc: 15
+      flag: split
+    - name: _detect_license_type
+      cc: 15
+      flag: split
+- path: weekly/checkers/release_readiness.py
+  lines: 162
+  classes: 1
+  methods: 4
+  cc_max: 15
+  inbound_deps: 0
+  exports:
+  - name: ReleaseReadinessChecker
+    type: class
+    cc_avg: 8.8
+    methods:
+    - name: check
+      cc: 11
+    - name: _check_version_consistency
+      cc: 15
+      flag: split
+      fan_out: 13
+- path: weekly/cli.py
+  lines: 327
+  classes: 0
+  methods: 5
+  cc_max: 14
+  inbound_deps: 0
+  exports:
+  - name: main
+    type: function
+    cc: 1
+  - name: analyze
+    type: function
+    cc: 9
+    fan_out: 18
+  - name: scan
+    type: function
+    cc: 8
+    fan_out: 15
+- path: weekly/checkers/style.py
+  lines: 367
+  classes: 2
+  methods: 13
+  cc_max: 12
+  inbound_deps: 0
+  exports:
+  - name: StyleIssue
+    type: class
+    cc_avg: 1.0
+  - name: StyleChecker
+    type: class
+    cc_avg: 4.8
+    methods:
+    - name: _parse_flake8_output
+      cc: 10
+      fan_out: 11
+    - name: _parse_mypy_output
+      cc: 12
+      fan_out: 10
+    - name: _generate_report
+      cc: 10
+      fan_out: 12
+- path: weekly/git_change_analyzer.py
+  lines: 418
+  classes: 3
+  methods: 7
+  cc_max: 11
+  inbound_deps: 0
+  exports:
+  - name: CommitInfo
+    type: class
+    cc_avg: 0.0
+  - name: ChangeSummary
+    type: class
+    cc_avg: 0.0
+  - name: GitChangeAnalyzer
+    type: class
+    cc_avg: 6.6
+    methods:
+    - name: get_commits_since
+      cc: 10
+      fan_out: 16
+    - name: _classify_commit
+      cc: 11
+    - name: generate_changelog_with_git_cliff
+      cc: 8
+      fan_out: 14
+- path: weekly/checkers/packaging.py
+  lines: 159
+  classes: 1
+  methods: 4
+  cc_max: 9
+  inbound_deps: 0
+  exports:
+  - name: PackagingChecker
+    type: class
+    cc_avg: 6.5
+- path: weekly/checkers/security.py
+  lines: 205
+  classes: 1
+  methods: 4
+  cc_max: 8
+  inbound_deps: 0
+  exports:
+  - name: SecurityChecker
+    type: class
+    cc_avg: 7.0
+    methods:
+    - name: check
+      cc: 7
+      fan_out: 10
+    - name: _detect_secrets
+      cc: 8
+      fan_out: 10
+    - name: _detect_insecure_functions
+      cc: 8
+      fan_out: 10
+- path: weekly/checkers/base.py
+  lines: 71
+  classes: 2
+  methods: 3
+  cc_max: 4
+  inbound_deps: 0
+  exports:
+  - name: CheckSeverity
+    type: class
+    cc_avg: 0.0
+  - name: BaseChecker
+    type: class
+    cc_avg: 2.3
+- path: weekly/core/analyzer.py
+  lines: 61
+  classes: 0
+  methods: 1
+  cc_max: 4
+  inbound_deps: 1
+  exports:
+  - name: analyze_project
+    type: function
+    cc: 4
+    fan_out: 15
+- path: weekly/core/project.py
+  lines: 153
+  classes: 1
+  methods: 3
+  cc_max: 4
+  inbound_deps: 0
+  exports:
+  - name: Project
+    type: class
+    cc_avg: 2.0
+- path: weekly/core/report.py
+  lines: 221
+  classes: 2
+  methods: 9
+  cc_max: 4
+  inbound_deps: 0
+  exports:
+  - name: CheckResult
+    type: class
+    cc_avg: 1.5
+  - name: Report
+    type: class
+    cc_avg: 2.5
+- path: weekly/core/logger.py
+  lines: 48
+  classes: 0
+  methods: 2
+  cc_max: 2
+  inbound_deps: 1
+  exports:
+  - name: get_logger
+    type: function
+    cc: 2
+  - name: set_log_level
+    type: function
+    cc: 2
+- path: setup.py
+  lines: 11
+  classes: 0
+  methods: 0
+  cc_max: 0
+  inbound_deps: 0
+- path: weekly/__init__.py
+  lines: 65
+  classes: 0
+  methods: 0
+  cc_max: 0
+  inbound_deps: 0
+- path: weekly/checkers/__init__.py
+  lines: 27
+  classes: 0
+  methods: 0
+  cc_max: 0
+  inbound_deps: 0
+hotspots:
+- name: GitReportGenerator.generate_llm_report
+  fan_out: 33
+  note: "Generate an LLM-optimized Markdown report for code fixing.\n\nArgs:\n   \
+    \ results: D"
+- name: GitScanner._generate_repo_report
+  fan_out: 32
+  note: "Generate a report for a single repository.\n\nArgs:\n    repo: The Git repository\n\
+    \ "
+- name: GitScanner.scan_repo
+  fan_out: 30
+  note: Scan a single repository and return the results.
+- name: CodeQualityChecker._find_common_issues
+  fan_out: 26
+  note: Find common code quality issues.
+- name: GitScanner.scan_all
+  fan_out: 19
+  note: Scan all repositories and generate reports.
+- name: analyze
+  fan_out: 18
+  note: Analysis pipeline, 18 stages
+- name: GitChangeAnalyzer.get_commits_since
+  fan_out: 16
+  note: "Get all commits since a specific date.\n\nArgs:\n    since_date: Get commits\
+    \ since "
+- name: GitReportGenerator.generate_markdown_report
+  fan_out: 16
+  note: "Generate a Markdown report for a repository scan.\n\nArgs:\n    results:\
+    \ Dictionary"
+- name: scan
+  fan_out: 15
+  note: 'Scan multiple Git repositories and generate quality reports.
+
+
+    ROOT_DIR: Director'
+- name: analyze_project
+  fan_out: 15
+  note: Analysis pipeline, 15 stages
+refactoring:
+  priorities:
+  - action: Split DependenciesChecker._get_dependencies (CC=54 → target CC<10)
+    impact: high
+    effort: low
+    module: dependencies.py
+  - action: Split CodeQualityChecker._find_common_issues (CC=39 → target CC<10)
+    impact: high
+    effort: low
+    module: code_quality.py
+  - action: Split GitReportGenerator.generate_llm_report (CC=48 → target CC<10)
+    impact: high
+    effort: low
+    module: git_report.py
+  - action: Split GitScanner._generate_repo_report (CC=31 → target CC<10)
+    impact: high
+    effort: low
+    module: git_scanner.py
+  - action: Split god module weekly/git_report.py (922L, 2 classes)
+    impact: high
+    effort: high
+  - action: Split god module weekly/git_scanner.py (638L, 3 classes)
+    impact: high
+    effort: high
+  - action: Split CIChecker._detect_cd_config (CC=15 → target CC<10)
+    impact: medium
+    effort: low
+    module: ci_cd.py
+  - action: Split ReleaseReadinessChecker._check_version_consistency (CC=15 → target
+      CC<10)
+    impact: medium
+    effort: low
+    module: release_readiness.py
+  - action: Split CodeQualityChecker.check (CC=18 → target CC<10)
+    impact: medium
+    effort: low
+    module: code_quality.py
+  - action: Split DocumentationChecker.check (CC=15 → target CC<10)
+    impact: medium
+    effort: low
+    module: docs.py
+  - action: Split DocumentationChecker._detect_license_type (CC=15 → target CC<10)
+    impact: medium
+    effort: low
+    module: docs.py
+  - action: Split GitRepo.__post_init__ (CC=15 → target CC<10)
+    impact: medium
+    effort: low
+    module: git_scanner.py
+  - action: Reduce GitReportGenerator.generate_llm_report fan-out (currently 33)
+    impact: medium
+    effort: medium
+  - action: Reduce GitScanner._generate_repo_report fan-out (currently 32)
+    impact: medium
+    effort: medium
+  - action: Reduce GitScanner.scan_repo fan-out (currently 30)
+    impact: medium
+    effort: medium
+evolution:
+- date: '2026-03-08'
+  cc_avg: 7.6
+  critical: 27
+  lines: 6251
+  note: Automated analysis

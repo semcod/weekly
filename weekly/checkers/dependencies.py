@@ -1,8 +1,7 @@
 """
 Dependencies checker for Weekly - checks project dependencies and their health.
 """
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from ..core.project import Project
 from ..core.report import CheckResult

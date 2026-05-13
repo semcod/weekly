@@ -1,8 +1,7 @@
 """
 Documentation checker for Weekly - checks for project documentation.
 """
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from ..core.project import Project
 from ..core.report import CheckResult

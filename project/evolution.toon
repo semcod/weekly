@@ -1,0 +1,53 @@
+# code2llm/evolution | 100 func | 18f | 2026-03-08
+
+NEXT[9] (ranked by impact):
+  [1] !! SPLIT           weekly/git_report.py
+      WHY: 922L, 2 classes, max CC=48
+      EFFORT: ~4h  IMPACT: 44256
+
+  [2] !! SPLIT           weekly/git_scanner.py
+      WHY: 638L, 3 classes, max CC=31
+      EFFORT: ~4h  IMPACT: 19778
+
+  [3] !! SPLIT-FUNC      GitReportGenerator.generate_llm_report  CC=48  fan=33
+      WHY: CC=48 exceeds 15
+      EFFORT: ~1h  IMPACT: 1584
+
+  [4] !! SPLIT-FUNC      CodeQualityChecker._find_common_issues  CC=39  fan=26
+      WHY: CC=39 exceeds 15
+      EFFORT: ~1h  IMPACT: 1014
+
+  [5] !! SPLIT-FUNC      GitScanner._generate_repo_report  CC=31  fan=32
+      WHY: CC=31 exceeds 15
+      EFFORT: ~1h  IMPACT: 992
+
+  [6] !! SPLIT-FUNC      DependenciesChecker._get_dependencies  CC=54  fan=12
+      WHY: CC=54 exceeds 15
+      EFFORT: ~1h  IMPACT: 648
+
+  [7] !  SPLIT-FUNC      CodeQualityChecker.check  CC=18  fan=11
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 198
+
+  [8] !  SPLIT-FUNC      ReleaseReadinessChecker._check_version_consistency  CC=15  fan=13
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 195
+
+  [9] !  SPLIT-FUNC      DocumentationChecker.check  CC=15  fan=9
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 135
+
+
+RISKS[2]:
+  ⚠ Splitting weekly/git_report.py may break 7 import paths
+  ⚠ Splitting weekly/git_scanner.py may break 12 import paths
+
+METRICS-TARGET:
+  CC̄:          7.7 → ≤5.0
+  max-CC:      54 → ≤20
+  god-modules: 2 → 0
+  high-CC(≥15): 10 → ≤5
+  hub-types:   0 → ≤0
+
+HISTORY:
+  (first run — no previous data)

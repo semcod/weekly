@@ -1,0 +1,9 @@
+flowchart TD
+    weekly_checkers["weekly.checkers<br/>53 funcs"]
+    weekly_cli["weekly.cli<br/>5 funcs"]
+    weekly_core["weekly.core<br/>15 funcs"]
+    weekly_git_report["weekly.git_report<br/>7 funcs"]
+    weekly_git_scanner["weekly.git_scanner<br/>12 funcs"]
+    weekly_git_scanner -->|2| weekly_git_report
+    weekly_cli -->|1| weekly_core
+    weekly_checkers -->|1| weekly_core

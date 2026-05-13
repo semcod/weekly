@@ -2,7 +2,6 @@
 Core analysis functionality for Weekly.
 """
 from pathlib import Path
-from typing import List
 
 from ..checkers.ci_cd import CIChecker
 from ..checkers.code_quality import CodeQualityChecker
@@ -17,7 +16,7 @@ from ..checkers.testing import TestChecker
 # Import all checkers
 from ..core.logger import get_logger
 from .project import Project
-from .report import CheckResult, Report
+from .report import Report
 
 logger = get_logger(__name__)
 

@@ -215,6 +215,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replaced deprecated `datetime.utcnow()` usage with timezone-aware UTC timestamps
 - Cleaned up `GitScanner` summary report generation (removed dead code, fixed logic) and adapted checker execution to use `Project` where applicable
 
+- feat(goal): add deep code analysis engine with seven supporting modules
+- feat(core): add CLI, validation, and API
+- feat(tests): enhance pytest integration and comprehensive test coverage (edge cases and error handling)
+- refactor(docs): improve documentation and add markdown output
+- refactor(tests): reorganize tests and code analysis engine tests
+- chore(goal): disable auto_update_config to preserve manual test strategy
+- refactor(report): improve LLM report formatting and style
+- refactor(docs): commit message generator and code relationship mapping
+
 ## [0.1.3] - 2025-06-07
 
 ### Added

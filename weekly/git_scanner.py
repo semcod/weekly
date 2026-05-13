@@ -1,29 +1,21 @@
 """Module for scanning Git repositories and generating reports."""
 from __future__ import annotations
 
-import json
 import os
 import shlex
-import shutil
 import subprocess
-import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional
 
-from rich.console import Console
-from rich.panel import Panel
 from rich.progress import (
     BarColumn,
     Progress,
     SpinnerColumn,
     TaskProgressColumn,
-    TextColumn,
 )
-from rich.table import Table
-from rich.tree import Tree
 
 from weekly.core.logger import get_logger
 from weekly.core.project import Project

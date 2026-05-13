@@ -5,12 +5,10 @@ Project class for Weekly - represents a project to be analyzed.
 from __future__ import annotations
 
 import configparser
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import toml
-import yaml
 
 
 class Project:

@@ -1,0 +1,427 @@
+"""
+Git scanner report generation module for Weekly.
+"""
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+from weekly.core.report import CheckResult
+
+@dataclass
+class RepoInfo:
+    """Repository information for reports."""
+    name: str
+    org: str = ''
+    path: str = ''
+    branch: str = 'main'
+    remote_url: str = ''
+    last_commit_date: Optional[str] = None
+    has_errors: bool = False
+    scan_command: Optional[str] = None
+    scan_since: Optional[str] = None
+
+class GitReportGenerator:
+    """Generates reports for Git repository scans."""
+
+    @staticmethod
+    def generate_llm_report(results: Dict[str, CheckResult], repo_info: RepoInfo, output_path: Union[str, Path], title: str='Weekly Report - LLM Format') -> None:
+        """Generate an LLM-optimized Markdown report for code fixing.
+
+        Args:
+            results: Dictionary of check results
+            repo_info: Repository information
+            output_path: Path to save the Markdown report
+            title: Report title
+        """
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        markdown_lines = []
+        markdown_lines.append(f'# {title} - LLM Code Fixing Report')
+        markdown_lines.append('')
+        markdown_lines.append('## 🤖 LLM Instructions')
+        markdown_lines.append('')
+        markdown_lines.append('**Your Role:** You are a Python code quality expert helping to fix issues systematically.')
+        markdown_lines.append('**Your Task:** Analyze the report below and provide a step-by-step fix plan.')
+        markdown_lines.append('**Priority Order:** Critical errors → Bulk formatting → Detailed fixes')
+        markdown_lines.append('')
+        markdown_lines.append('---')
+        markdown_lines.append('')
+        markdown_lines.append('## 📁 Repository Context')
+        markdown_lines.append('')
+        markdown_lines.append(f'- **Project:** {repo_info.org}/{repo_info.name}')
+        markdown_lines.append(f'- **Location:** `{repo_info.path}`')
+        markdown_lines.append(f'- **Branch:** {repo_info.branch}')
+        markdown_lines.append(f"- **Analysis Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        if repo_info.scan_since:
+            markdown_lines.append(f'- **Scan Since:** {repo_info.scan_since}')
+        if repo_info.scan_command:
+            markdown_lines.append('')
+            markdown_lines.append('## 🧾 Scan Invocation')
+            markdown_lines.append('')
+            markdown_lines.append('```bash')
+            markdown_lines.append(repo_info.scan_command)
+            markdown_lines.append('```')
+        markdown_lines.append('')
+        markdown_lines.append('---')
+        markdown_lines.append('')
+        repo_prefix = repo_info.path.rstrip('/') + '/'
+        issues_by_file: Dict[str, List[Dict[str, Any]]] = {}
+        bulk_issues: Dict[str, List[Dict[str, Any]]] = {}
+        changelog_info: Optional[Dict[str, Any]] = None
+        for name, result in results.items():
+            if name == 'changelog' and result.metadata:
+                changelog_info = result.metadata
+                continue
+            if result.metadata and 'issues_data' in result.metadata:
+                issues_data = result.metadata['issues_data']
+                for tool, issues in issues_data.items():
+                    if tool not in bulk_issues:
+                        bulk_issues[tool] = []
+                    for issue in issues:
+                        file_path = issue['file']
+                        if file_path not in issues_by_file:
+                            issues_by_file[file_path] = []
+                        issues_by_file[file_path].append({**issue, 'tool': tool})
+                        bulk_issues[tool].append(issue)
+        if changelog_info:
+            markdown_lines.append('## 📈 Recent Changes')
+            markdown_lines.append('')
+            markdown_lines.append(f"**Commits in the last period:** {changelog_info.get('total_commits', 0)}")
+            markdown_lines.append(f"**Files modified:** {changelog_info.get('files_changed', 0)}")
+            markdown_lines.append(f"**Lines added:** {changelog_info.get('additions', 0)}")
+            markdown_lines.append(f"**Lines removed:** {changelog_info.get('deletions', 0)}")
+            markdown_lines.append('')
+            if changelog_info.get('changelog_generator'):
+                markdown_lines.append(f"**Changelog generator:** `{changelog_info.get('changelog_generator')}`")
+            if changelog_info.get('changelog_path'):
+                markdown_lines.append(f"**Changelog path:** `{changelog_info.get('changelog_path')}`")
+            if changelog_info.get('changelog_generator') or changelog_info.get('changelog_path'):
+                markdown_lines.append('')
+            commit_types = changelog_info.get('commit_types', {})
+            if commit_types:
+                markdown_lines.append('**Commit types:**')
+                for c_type, count in sorted(commit_types.items(), key=lambda x: x[1], reverse=True):
+                    emoji = {'feat': '✨', 'fix': '🐛', 'refactor': '♻️', 'docs': '📚', 'style': '💄', 'test': '✅', 'chore': '🔧', 'perf': '⚡', 'ci': '👷', 'build': '📦', 'other': '📝'}.get(c_type, '📝')
+                    markdown_lines.append(f'- {emoji} {c_type.title()}: {count}')
+                markdown_lines.append('')
+            markdown_lines.append('**📝 View full changelog:** `changelog.md` in the report directory')
+            markdown_lines.append('')
+            excerpt = changelog_info.get('changelog_excerpt')
+            if excerpt:
+                markdown_lines.append('**Changelog excerpt (first lines):**')
+                markdown_lines.append('```text')
+                markdown_lines.append(str(excerpt).rstrip())
+                markdown_lines.append('```')
+                markdown_lines.append('')
+            markdown_lines.append('---')
+            markdown_lines.append('')
+        markdown_lines.append('## 🚨 Priority 1: Critical Errors')
+        markdown_lines.append('')
+        markdown_lines.append('*These errors must be fixed manually before formatting.*')
+        markdown_lines.append('')
+        critical_found = False
+        critical_count = 0
+        for file_path in sorted(issues_by_file.keys()):
+            file_issues = issues_by_file[file_path]
+            critical_file_issues = [i for i in file_issues if i['tool'] != 'black' and i['code'] != 'BLK100']
+            if critical_file_issues:
+                critical_found = True
+                critical_count += len(critical_file_issues)
+                markdown_lines.append(f'### 📄 File: `{file_path}`')
+                markdown_lines.append('')
+                for issue in sorted(critical_file_issues, key=lambda x: x['line']):
+                    markdown_lines.append(f"**Line {issue['line']}:** `{issue['code']}` - {issue['message']}")
+                    markdown_lines.append(f"- **Tool:** {issue['tool']}")
+                    markdown_lines.append(f"- **Command:** `{issue['tool'].lower()} {file_path}`")
+                    markdown_lines.append('')
+        if not critical_found:
+            markdown_lines.append('✅ **No critical errors found.**')
+            markdown_lines.append('')
+        else:
+            markdown_lines.append(f'**Total Critical Errors:** {critical_count}')
+            markdown_lines.append('')
+        markdown_lines.append('## 📝 Priority 2: Bulk Formatting Issues')
+        markdown_lines.append('')
+        markdown_lines.append('*These can be fixed automatically with a single command.*')
+        markdown_lines.append('')
+        for tool, issues in bulk_issues.items():
+            if tool.lower() in ['black', 'isort'] and len(issues) > 5:
+                tool_name = tool.upper()
+                file_count = len(issues)
+                markdown_lines.append(f'### {tool_name} Formatting ({file_count} files)')
+                markdown_lines.append('')
+                markdown_lines.append('**Affected Files (showing first 10):**')
+                for issue in issues[:10]:
+                    rel_path = str(issue.get('file', '')).replace(repo_prefix, '')
+                    markdown_lines.append(f'- `{rel_path}`')
+                if len(issues) > 10:
+                    markdown_lines.append(f'- ... and {len(issues) - 10} more files')
+                markdown_lines.append('')
+                markdown_lines.append('**Fix Command:**')
+                markdown_lines.append('```bash')
+                markdown_lines.append(f'cd {repo_info.path} && {tool.lower()} .')
+                markdown_lines.append('```')
+                markdown_lines.append('')
+                if tool.lower() == 'black':
+                    markdown_lines.append('⚠️ **Note:** Black will reformat your code. Review changes before committing.')
+                    markdown_lines.append('')
+        markdown_lines.append('## 📋 Priority 3: Individual File Issues')
+        markdown_lines.append('')
+        markdown_lines.append('*These require individual attention per file.*')
+        markdown_lines.append('')
+        markdown_lines.append(f'*Showing first 20 files with non-formatting issues*')
+        markdown_lines.append('')
+        file_count = 0
+        for file_path in sorted(issues_by_file.keys()):
+            if file_count >= 20:
+                break
+            file_issues = issues_by_file[file_path]
+            if all((i['tool'].lower() in ['black', 'isort'] for i in file_issues)):
+                continue
+            file_count += 1
+            rel_path = file_path.replace(repo_prefix, '')
+            markdown_lines.append(f'### 📄 File: `{rel_path}`')
+            markdown_lines.append('')
+            issues_by_line: Dict[int, List[Dict[str, Any]]] = {}
+            for issue in file_issues:
+                if issue['tool'].lower() in ['black', 'isort']:
+                    continue
+                line = issue['line']
+                if line not in issues_by_line:
+                    issues_by_line[line] = []
+                issues_by_line[line].append(issue)
+            if issues_by_line:
+                for line in sorted(issues_by_line.keys()):
+                    line_issues = issues_by_line[line]
+                    for issue in line_issues:
+                        markdown_lines.append(f"**Line {line}:** `{issue['code']}` - {issue['message']}")
+                        markdown_lines.append(f"- **Tool:** {issue['tool']}")
+                        markdown_lines.append('')
+            else:
+                markdown_lines.append('*Only formatting issues (see Priority 2)*')
+                markdown_lines.append('')
+        if file_count == 0:
+            markdown_lines.append('✅ **No individual file issues found beyond formatting.**')
+            markdown_lines.append('')
+        markdown_lines.append('---')
+        markdown_lines.append('')
+        markdown_lines.append('## 📊 Issue Summary')
+        markdown_lines.append('')
+        total_issues = sum((len(issues) for issues in bulk_issues.values()))
+        critical_issue_count = sum((len([i for i in issues if i.get('tool', '').lower() not in ['black', 'isort']]) for issues in bulk_issues.values()))
+        formatting_issues = total_issues - critical_issue_count
+        markdown_lines.append(f'- **Total Issues:** {total_issues}')
+        markdown_lines.append(f'- **Critical Errors:** {critical_issue_count}')
+        markdown_lines.append(f'- **Formatting Issues:** {formatting_issues}')
+        markdown_lines.append(f'- **Files Affected:** {len(issues_by_file)}')
+        markdown_lines.append('')
+        markdown_lines.append('## 🎯 LLM Action Plan')
+        markdown_lines.append('')
+        markdown_lines.append('Please provide:')
+        markdown_lines.append('')
+        markdown_lines.append('1. **Risk Assessment** - Any potential issues with automated fixes?')
+        markdown_lines.append('2. **Step-by-Step Plan** - Exact commands to run in order')
+        markdown_lines.append('3. **Verification Steps** - How to confirm fixes worked')
+        markdown_lines.append('4. **Backup Strategy** - Should we create a backup first?')
+        markdown_lines.append('')
+        markdown_lines.append('### Suggested Workflow:')
+        markdown_lines.append('')
+        markdown_lines.append('```bash')
+        markdown_lines.append('# 1. Create a backup branch')
+        markdown_lines.append('git checkout -b fix/code-quality')
+        markdown_lines.append('')
+        markdown_lines.append('# 2. Fix critical errors manually (if any)')
+        markdown_lines.append('# [Edit files as needed]')
+        markdown_lines.append('')
+        markdown_lines.append('# 3. Apply formatting fixes')
+        markdown_lines.append(f'cd {repo_info.path} && black .')
+        markdown_lines.append(f'cd {repo_info.path} && isort .')
+        markdown_lines.append('')
+        markdown_lines.append('# 4. Review and commit')
+        markdown_lines.append('git diff --stat')
+        markdown_lines.append('git add .')
+        markdown_lines.append("git commit -m 'fix: apply code formatting and linting fixes'")
+        markdown_lines.append('```')
+        markdown_lines.append('')
+        markdown_lines.append('### Next Steps for LLM:')
+        markdown_lines.append('')
+        markdown_lines.append('- [ ] Confirm the workflow above is safe')
+        markdown_lines.append('- [ ] Identify any files that need manual review')
+        markdown_lines.append('- [ ] Suggest testing procedures')
+        markdown_lines.append('- [ ] Recommend prevention strategies (e.g., pre-commit hooks)')
+        markdown_lines.append('')
+        markdown_lines.append('---')
+        markdown_lines.append('')
+        markdown_lines.append('*This LLM-optimized report was generated by Weekly tool*')
+        markdown_lines.append(f"*Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
+        markdown_lines.append('')
+        markdown_lines.append('**End of Report**')
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(markdown_lines))
+
+    @staticmethod
+    def generate_markdown_report(results: Dict[str, CheckResult], repo_info: RepoInfo, output_path: Union[str, Path], title: str='Weekly Git Report') -> None:
+        """Generate a Markdown report for a repository scan.
+
+        Args:
+            results: Dictionary of check results
+            repo_info: Repository information
+            output_path: Path to save the Markdown report
+            title: Report title
+        """
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        markdown_lines = []
+        markdown_lines.append(f'# {title}')
+        markdown_lines.append('')
+        markdown_lines.append(f"**Generated on:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        markdown_lines.append('')
+        markdown_lines.append('## Repository Information')
+        markdown_lines.append('')
+        markdown_lines.append(f'- **Name:** {repo_info.org}/{repo_info.name}')
+        markdown_lines.append(f'- **Branch:** {repo_info.branch}')
+        markdown_lines.append(f'- **Path:** {repo_info.path}')
+        markdown_lines.append(f"- **Status:** {('✅ All checks passed' if not any((not result.is_ok for result in results.values())) else '❌ Issues found')}")
+        markdown_lines.append('')
+        markdown_lines.append('## Check Results')
+        markdown_lines.append('')
+        for name, result in results.items():
+            status_icon = '✅' if result.is_ok else '❌'
+            markdown_lines.append(f'### {status_icon} {name.title()}')
+            markdown_lines.append('')
+            markdown_lines.append(f'**Status:** {result.message}')
+            markdown_lines.append('')
+            if result.metadata and 'issues_data' in result.metadata:
+                issues_data = result.metadata['issues_data']
+                for tool, issues in issues_data.items():
+                    markdown_lines.append(f'#### {tool.upper()} Issues ({len(issues)} total)')
+                    markdown_lines.append('')
+                    for issue in issues:
+                        markdown_lines.append(f"- **File:** `{issue['file']}:{issue['line']}`")
+                        markdown_lines.append(f"  - **Code:** `{issue['code']}`")
+                        markdown_lines.append(f"  - **Message:** {issue['message']}")
+                        markdown_lines.append(f'  - **Fix:** Run `{tool.lower()}` to fix this issue')
+                        markdown_lines.append('')
+            if result.next_steps:
+                markdown_lines.append('**Next Steps:**')
+                markdown_lines.append('')
+                for step in result.next_steps:
+                    markdown_lines.append(f'- {step}')
+                markdown_lines.append('')
+            markdown_lines.append('---')
+            markdown_lines.append('')
+        markdown_lines.append('---')
+        markdown_lines.append(f"*Report generated by Weekly - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(markdown_lines))
+
+    @staticmethod
+    def generate_html_report(results: Dict[str, CheckResult], repo_info: RepoInfo, output_path: Union[str, Path], title: str='Weekly Git Report') -> None:
+        """Generate an HTML report for a repository scan.
+
+        Args:
+            results: Dictionary of check results
+            repo_info: Repository information
+            output_path: Path to save the HTML report
+            title: Report title
+        """
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        context = {'title': title, 'repo_info': asdict(repo_info), 'results': [{'name': name, 'description': result.description, 'is_ok': result.is_ok, 'message': result.message, 'details': result.metadata if result.metadata else result.details, 'next_steps': result.next_steps, 'severity': result.severity} for name, result in results.items()], 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'has_errors': any((not result.is_ok for result in results.values()))}
+        md_output_path = output_path.with_suffix('.md')
+        GitReportGenerator.generate_markdown_report(results, repo_info, md_output_path, title)
+        llm_output_path = output_path.with_suffix('.llm.md')
+        GitReportGenerator.generate_llm_report(results, repo_info, llm_output_path, title)
+        html = GitReportGenerator._render_html_template('repo_report.html', context)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(html)
+
+    @staticmethod
+    def generate_summary_report(repos: List[Dict[str, Any]], output_path: Union[str, Path], title: str='Weekly Scan Summary', scan_date: Optional[str]=None, since_date: Optional[str]=None) -> None:
+        """Generate a summary HTML report for multiple repositories.
+
+        Args:
+            repos: List of repository information dictionaries
+            output_path: Path to save the HTML report
+            title: Report title
+            scan_date: Date of the scan (default: current date)
+            since_date: Only include changes since this date
+        """
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        context = {'title': title, 'repos': repos, 'scan_date': scan_date or datetime.now().strftime('%Y-%m-%d'), 'since_date': since_date, 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+        html = GitReportGenerator._render_html_template('summary_report.html', context)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(html)
+
+    @staticmethod
+    def _render_html_template(template_name: str, context: Dict[str, Any]) -> str:
+        """Render an HTML template with the given context.
+
+        Args:
+            template_name: Name of the template file
+            context: Dictionary of template variables
+
+        Returns:
+            Rendered HTML as a string
+        """
+        try:
+            import os
+            from jinja2 import Environment, FileSystemLoader
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            template_dir = os.path.join(current_dir, 'templates')
+            env = Environment(loader=FileSystemLoader(template_dir))
+            template = env.get_template(template_name)
+            rendered: str = template.render(**context)
+            return rendered
+        except ImportError:
+            if template_name == 'repo_report.html':
+                return GitReportGenerator._render_repo_report(context)
+            elif template_name == 'summary_report.html':
+                return GitReportGenerator._render_summary_report(context)
+            else:
+                raise ValueError(f'Unknown template: {template_name}')
+
+    @staticmethod
+    def _render_repo_report(context: Dict[str, Any]) -> str:
+        """Render the repository report template."""
+        repo_info = context['repo_info']
+        results = context['results']
+        status_badge = '\n        <div class="status-badge">\n            <span class="badge {badge_class}">{status_text}</span>\n        </div>\n        '.format(badge_class='badge-success' if not context['has_errors'] else 'badge-error', status_text='All checks passed' if not context['has_errors'] else 'Issues found')
+        results_table = ''
+        for result in results:
+            status_icon = '✓' if result['is_ok'] else '✗'
+            status_class = 'success' if result['is_ok'] else 'error'
+            details = ''
+            if result['details']:
+                if isinstance(result['details'], dict) and 'issues_data' in result['details']:
+                    issues_data = result['details']['issues_data']
+                    details_html = "<div class='issue-list'>"
+                    for tool, issues in issues_data.items():
+                        details_html += f"<div class='tool-section'>"
+                        details_html += f"<div class='tool-header'>{tool.upper()} - {len(issues)} issues</div>"
+                        for issue in issues[:100]:
+                            details_html += f"\n                            <div class='issue-item'>\n                                <div class='issue-file'>{issue['file']}:{issue['line']}</div>\n                                <div><span class='issue-code'>{issue['code']}</span> - {issue['message']}</div>\n                                <div style='margin-top: 5px; font-size: 0.9em; color: #666;'>\n                                    Fix: Run <code>{tool.lower()}</code> to address this issue\n                                </div>\n                            </div>\n                            "
+                        if len(issues) > 100:
+                            details_html += f"<div style='text-align: center; padding: 10px; color: #666;'>... and {len(issues) - 100} more issues</div>"
+                        details_html += '</div>'
+                    details_html += '</div>'
+                    details = details_html
+                else:
+                    details = f"<pre>{result['details']}</pre>"
+            next_steps = ''
+            if result['next_steps']:
+                next_steps = '<ul>' + ''.join((f'<li>{step}</li>' for step in result['next_steps'])) + '</ul>'
+            results_table += f'''\n            <tr class="{status_class}">\n                <td>{result['name']}</td>\n                <td><span class="status-icon">{status_icon}</span> {result['message']}</td>\n                <td>{details}</td>\n                <td>{next_steps}</td>\n            </tr>\n            '''
+        return f"""\n        <!DOCTYPE html>\n        <html>\n        <head>\n            <meta charset="UTF-8">\n            <title>{context['title']}</title>\n            <style>\n                body {{ font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }}\n                .container {{ max-width: 1200px; margin: 0 auto; }}\n                .header {{ margin-bottom: 30px; }}\n                .repo-info {{ background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}\n                .status-badge {{ margin: 10px 0; }}\n                .badge {{ \n                    display: inline-block; \n                    padding: 5px 10px; \n                    border-radius: 3px; \n                    color: white; \n                    font-weight: bold; \n                }}\n                .badge-success {{ background: #28a745; }}\n                .badge-error {{ background: #dc3545; }}\n                table {{ \n                    width: 100%; \n                    border-collapse: collapse; \n                    margin: 20px 0;\n                }}\n                th, td {{ \n                    padding: 12px; \n                    text-align: left; \n                    border-bottom: 1px solid #ddd;\n                }}\n                th {{ background: #f5f5f5; }}\n                tr.success {{ background: #f0fff0; }}\n                tr.error {{ background: #fff0f0; }}\n                .status-icon {{ font-weight: bold; }}\n                pre {{ \n                    background: #f8f9fa; \n                    padding: 10px; \n                    border-radius: 3px; \n                    overflow-x: auto;\n                    white-space: pre-wrap;\n                    word-wrap: break-word;\n                }}\n                .issue-list {{\n                    max-height: 500px;\n                    overflow-y: auto;\n                    border: 1px solid #ddd;\n                    border-radius: 3px;\n                    padding: 10px;\n                    background: #f9f9f9;\n                }}\n                .issue-item {{\n                    margin-bottom: 10px;\n                    padding: 8px;\n                    background: white;\n                    border-radius: 3px;\n                    border-left: 3px solid #dc3545;\n                }}\n                .issue-file {{\n                    font-family: monospace;\n                    font-weight: bold;\n                    color: #0066cc;\n                }}\n                .issue-code {{\n                    font-family: monospace;\n                    background: #e9ecef;\n                    padding: 2px 4px;\n                    border-radius: 2px;\n                    font-size: 0.9em;\n                }}\n                .tool-section {{\n                    margin-bottom: 20px;\n                }}\n                .tool-header {{\n                    background: #f5f5f5;\n                    padding: 8px;\n                    font-weight: bold;\n                    border-radius: 3px;\n                    margin-bottom: 10px;\n                }}\n                .footer {{ \n                    margin-top: 30px; \n                    text-align: center; \n                    color: #6c757d; \n                    font-size: 0.9em;\n                }}\n            </style>\n        </head>\n        <body>\n            <div class="container">\n                <div class="header">\n                    <h1>{context['title']}</h1>\n                    <p>Generated on {context['timestamp']}</p>\n                </div>\n                \n                <div class="repo-info">\n                    <h2>{repo_info['org']}/{repo_info['name']}</h2>\n                    <p>Branch: {repo_info['branch']}</p>\n                    <p>Path: {repo_info['path']}</p>\n                    {status_badge}\n                </div>\n                \n                <h2>Check Results</h2>\n                <table>\n                    <thead>\n                        <tr>\n                            <th>Check</th>\n                            <th>Status</th>\n                            <th>Details</th>\n                            <th>Next Steps</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        {results_table}\n                    </tbody>\n                </table>\n                \n                <div class="footer">\n                    <p>Report generated by Weekly - {context['timestamp']}</p>\n                </div>\n            </div>\n        </body>\n        </html>\n        """
+
+    @staticmethod
+    def _render_summary_report(context: Dict[str, Any]) -> str:
+        """Render the summary report template."""
+        repos = context['repos']
+        repo_cards = ''
+        for repo in repos:
+            status_icon = '✓' if not repo.get('has_errors', False) else '✗'
+            status_class = 'success' if not repo.get('has_errors', False) else 'error'
+            repo_cards += f'''\n            <div class="repo-card">\n                <h3>{repo['name']} <span class="status-icon {status_class}">{status_icon}</span></h3>\n                <p>Branch: {repo.get('branch', 'main')}</p>\n                <p>Last commit: {repo.get('last_commit', 'N/A')}</p>\n                <p><a href="{repo.get('report_path', '#')}">View full report →</a></p>\n            </div>\n            '''
+        return f"""\n        <!DOCTYPE html>\n        <html>\n        <head>\n            <meta charset="UTF-8">\n            <title>{context['title']}</title>\n            <style>\n                body {{ font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }}\n                .container {{ max-width: 1200px; margin: 0 auto; }}\n                .header {{ margin-bottom: 30px; }}\n                .summary-info {{ \n                    background: #f5f5f5; \n                    padding: 15px; \n                    border-radius: 5px; \n                    margin-bottom: 20px;\n                    display: flex;\n                    justify-content: space-between;\n                }}\n                .repo-grid {{ \n                    display: grid; \n                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); \n                    gap: 20px; \n                    margin: 20px 0;\n                }}\n                .repo-card {{ \n                    background: white; \n                    border: 1px solid #ddd; \n                    border-radius: 5px; \n                    padding: 15px;\n                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n                }}\n                .repo-card h3 {{ margin-top: 0; }}\n                .status-icon {{ \n                    font-weight: bold; \n                    margin-left: 5px;\n                }}\n                .status-icon.success {{ color: #28a745; }}\n                .status-icon.error {{ color: #dc3545; }}\n                .footer {{ \n                    margin-top: 30px; \n                    text-align: center; \n                    color: #6c757d; \n                    font-size: 0.9em;\n                }}\n            </style>\n        </head>\n        <body>\n            <div class="container">\n                <div class="header">\n                    <h1>{context['title']}</h1>\n                    <p>Generated on {context['timestamp']}</p>\n                </div>\n                \n                <div class="summary-info">\n                    <div>\n                        <h2>Scan Summary</h2>\n                        <p>Repositories scanned: {len(repos)}</p>\n                        {(f"<p>Changes since: {context.get('since_date', 'N/A')}</p>" if context.get('since_date') else '')}\n                    </div>\n                </div>\n                \n                <h2>Repositories</h2>\n                <div class="repo-grid">\n                    {repo_cards}\n                </div>\n                \n                <div class="footer">\n                    <p>Report generated by Weekly - {context['timestamp']}</p>\n                </div>\n            </div>\n        </body>\n        </html>\n        """

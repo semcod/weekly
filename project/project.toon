@@ -1,0 +1,186 @@
+# weekly | 32f 6343L | python:32
+# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
+M[32]:
+  examples/git_scan_example.py,43
+  setup.py,8
+  test_change.py,7
+  tests/__init__.py,1
+  tests/benchmark_scan.py,87
+  tests/debug_parse_mypy.py,28
+  tests/test_cli.py,86
+  tests/test_packaging_checker.py,67
+  tests/test_release_readiness_checker.py,69
+  tests/test_scan_integration.py,92
+  tests/test_security_checker.py,77
+  tests/test_style_checker.py,191
+  weekly/__init__.py,49
+  weekly/checkers/__init__.py,25
+  weekly/checkers/base.py,56
+  weekly/checkers/ci_cd.py,191
+  weekly/checkers/code_quality.py,252
+  weekly/checkers/dependencies.py,283
+  weekly/checkers/docs.py,199
+  weekly/checkers/packaging.py,125
+  weekly/checkers/release_readiness.py,125
+  weekly/checkers/security.py,174
+  weekly/checkers/style.py,299
+  weekly/checkers/testing.py,163
+  weekly/cli.py,264
+  weekly/core/analyzer.py,47
+  weekly/core/logger.py,35
+  weekly/core/project.py,132
+  weekly/core/report.py,186
+  weekly/git_change_analyzer.py,327
+  weekly/git_report.py,782
+  weekly/git_scanner.py,495
+D:
+  examples/git_scan_example.py:
+    i: sys,datetime,datetime.timedelta,pathlib.Path,weekly.GitScanner
+    e: main
+    main()->None
+  tests/benchmark_scan.py:
+    i: argparse,shutil,subprocess,time,datetime,datetime.timedelta,pathlib.Path
+    e: create_mock_repo,run_benchmark
+    create_mock_repo(repo_path:Path;index:int)
+    run_benchmark(num_repos:int;jobs:int)
+  tests/debug_parse_mypy.py:
+    i: sys,pathlib.Path,weekly.checkers.style.StyleChecker
+    e: test_parse_mypy_output
+    test_parse_mypy_output()
+  tests/test_cli.py:
+    i: json,sys,pytest,click.testing.CliRunner,pathlib.Path,unittest.mock.{MagicMock,patch},weekly.cli.main
+    e: runner,test_analyze_command,test_analyze_org_command,test_cli_help,test_analyze_command_no_repo,test_analyze_org_command_no_repos
+    runner()
+    test_analyze_command(runner;tmp_path)
+    test_analyze_org_command(mock_find;mock_init;mock_scan_all;runner;tmp_path)
+    test_cli_help(runner)
+    test_analyze_command_no_repo(runner;tmp_path)
+    test_analyze_org_command_no_repos(mock_find;runner;tmp_path)
+  tests/test_packaging_checker.py:
+    i: pytest,pathlib.Path,unittest.mock.MagicMock,weekly.checkers.packaging.PackagingChecker,weekly.core.project.Project,weekly.core.report.CheckResult
+    e: packaging_checker,test_packaging_checker_initialization,test_packaging_checker_modern_poetry,test_packaging_checker_missing_build_system,test_packaging_checker_missing_metadata
+    packaging_checker()
+    test_packaging_checker_initialization(packaging_checker)
+    test_packaging_checker_modern_poetry(tmp_path;packaging_checker)
+    test_packaging_checker_missing_build_system(tmp_path;packaging_checker)
+    test_packaging_checker_missing_metadata(tmp_path;packaging_checker)
+  tests/test_release_readiness_checker.py:
+    i: pytest,pathlib.Path,unittest.mock.{MagicMock,patch},weekly.checkers.release_readiness.ReleaseReadinessChecker,weekly.core.project.Project,weekly.core.report.CheckResult
+    e: release_checker,test_release_checker_initialization,test_release_checker_consistent_version,test_release_checker_inconsistent_version,test_release_checker_missing_changelog_entry,test_release_checker_missing_dist
+    release_checker()
+    test_release_checker_initialization(release_checker)
+    test_release_checker_consistent_version(tmp_path;release_checker)
+    test_release_checker_inconsistent_version(tmp_path;release_checker)
+    test_release_checker_missing_changelog_entry(tmp_path;release_checker)
+    test_release_checker_missing_dist(tmp_path;release_checker)
+  tests/test_scan_integration.py:
+    i: os,shutil,subprocess,datetime,pytest,click.testing.CliRunner,datetime.timedelta,pathlib.Path,weekly.cli.main,weekly.git_scanner.GitScanner
+    e: temp_git_repo,test_scan_command_generates_reports,test_scan_with_since_filter
+    temp_git_repo(tmp_path)
+    test_scan_command_generates_reports(temp_git_repo;tmp_path)
+    test_scan_with_since_filter(temp_git_repo;tmp_path)
+  tests/test_security_checker.py:
+    i: pytest,pathlib.Path,unittest.mock.{MagicMock,patch},weekly.checkers.security.SecurityChecker,weekly.core.project.Project,weekly.core.report.CheckResult
+    e: security_checker,test_security_checker_initialization,test_security_checker_with_secrets,test_security_checker_with_insecure_functions,test_security_checker_with_sensitive_files,test_security_checker_passed
+    security_checker()
+    test_security_checker_initialization(security_checker)
+    test_security_checker_with_secrets(tmp_path;security_checker)
+    test_security_checker_with_insecure_functions(tmp_path;security_checker)
+    test_security_checker_with_sensitive_files(tmp_path;security_checker)
+    test_security_checker_passed(tmp_path;security_checker)
+  tests/test_style_checker.py:
+    i: os,shutil,subprocess,pytest,__future__.annotations,pathlib.Path,typing.List,unittest.mock.{MagicMock,patch},weekly.checkers.base.CheckResult
+    e: style_checker,test_style_checker_initialization,test_style_checker_with_valid_code,test_black_check_with_invalid_formatting,test_isort_check_with_misordered_imports,test_flake8_check_with_style_issues,test_mypy_check_with_type_issues,test_parse_black_output
+    style_checker()
+    test_style_checker_initialization(style_checker)
+    test_style_checker_with_valid_code(tmp_path;style_checker)
+    test_black_check_with_invalid_formatting(tmp_path;style_checker)
+    test_isort_check_with_misordered_imports(tmp_path;style_checker)
+    test_flake8_check_with_style_issues(tmp_path;style_checker)
+    test_mypy_check_with_type_issues(tmp_path;style_checker)
+    test_parse_black_output(style_checker)
+  weekly/checkers/base.py:
+    i: abc.{ABC,abstractmethod},core.logger.get_logger,core.project.Project,enum.Enum,pathlib.Path,typing.{Any,Dict,Optional,TYPE_CHECKING}
+    e: CheckSeverity,BaseChecker
+    CheckSeverity:   # Enumeration of possible check severit...
+    BaseChecker: __init__(1),name(0),description(0),check(1),_get_file_content(1)  # Abstract base class for all project c...
+  weekly/checkers/ci_cd.py:
+    i: base.BaseChecker,core.project.Project,core.report.CheckResult,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: CIChecker
+    CIChecker: name(0),description(0),check(1),_detect_ci_config(1),_detect_cd_config(1)  # Checker for CI/CD configuration.
+  weekly/checkers/code_quality.py:
+    i: re,core.project.Project,core.report.CheckResult,pathlib.Path,typing
+    e: CodeQualityChecker
+    CodeQualityChecker: name(0),description(0),check(1),_detect_formatters(1),_detect_linters(1)  # Checker for code style and quality.
+  weekly/checkers/dependencies.py:
+    i: base.BaseChecker,core.project.Project,core.report.CheckResult,pathlib.Path,typing.{Any,Dict,List,Optional,Tuple}
+    e: DependenciesChecker
+    DependenciesChecker: name(0),description(0),check(1),_get_dependencies(1),_parse_dep_spec(1)  # Checker for project dependencies.
+  weekly/checkers/docs.py:
+    i: base.BaseChecker,core.project.Project,core.report.CheckResult,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: DocumentationChecker
+    DocumentationChecker: name(0),description(0),check(1),_check_readme(1),_check_license(1)  # Checker for project documentation.
+  weekly/checkers/packaging.py:
+    i: base.BaseChecker,core.project.Project,core.report.CheckResult,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: PackagingChecker
+    PackagingChecker: name(0),description(0),check(1),_check_build_system(1),_check_metadata(1)  # Checker for project packaging and dis...
+  weekly/checkers/release_readiness.py:
+    i: base.BaseChecker,core.project.Project,core.report.CheckResult,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: ReleaseReadinessChecker
+    ReleaseReadinessChecker: name(0),description(0),check(1),_check_version_consistency(1),_check_changelog_status(2)  # Checker for release readiness.
+  weekly/checkers/security.py:
+    i: re,base.BaseChecker,core.project.Project,core.report.CheckResult,pathlib.Path,typing.{Any,Dict,List,Optional,Tuple}
+    e: SecurityChecker
+    SecurityChecker: name(0),description(0),check(1),_detect_secrets(1),_detect_insecure_functions(1)  # Checker for security issues and secrets.
+  weekly/checkers/style.py:
+    i: os,subprocess,__future__.annotations,dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,List,Optional,Tuple}
+    e: StyleIssue,StyleChecker
+    StyleIssue: to_dict(0)  # Represents a style issue found in the...
+    StyleChecker: __init__(1),check(1),_run_black_check(1),_parse_black_output(1),_run_isort_check(1)  # Checker for code style and formatting...
+  weekly/checkers/testing.py:
+    i: base.BaseChecker,core.project.Project,core.report.CheckResult,pathlib.Path,typing.Optional
+    e: TestChecker
+    TestChecker: name(0),description(0),check(1),_has_test_config(1),_check_test_coverage(1)  # Checker for testing configuration and...
+  weekly/cli.py:
+    i: json,sys,datetime,datetime.timedelta,pathlib.Path,typing.{Any,Dict,List,Optional,Union}
+    e: main,analyze,scan
+    main()->None
+    analyze(project_path:Path;output_format:str;output:str;show_suggestions:bool;verbose:bool)->None
+    _format_text_output(report:Report;show_suggestions:bool=True)->str
+    _parse_since_date(since_str:Optional[str])->Optional[datetime]
+    scan(root_dir:Path;output_dir:Path;since_str:Optional[str];recursive:bool;jobs:int;output_format:str;...+1)->int
+  weekly/core/analyzer.py:
+    i: checkers.ci_cd.CIChecker,checkers.code_quality.CodeQualityChecker,checkers.dependencies.DependenciesChecker,checkers.docs.DocumentationChecker,checkers.packaging.PackagingChecker,checkers.release_readiness.ReleaseReadinessChecker,checkers.security.SecurityChecker,checkers.style.StyleChecker,pathlib.Path,typing.List
+    e: analyze_project
+    analyze_project(project_path:Path)->Report
+  weekly/core/logger.py:
+    i: logging,sys,rich.logging.RichHandler,typing.Optional
+    e: get_logger,set_log_level
+    get_logger(name:str='weekly')->Any
+    set_log_level(level:str)->None
+  weekly/core/project.py:
+    i: configparser,json,toml,yaml,__future__.annotations,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: Project
+    Project: __init__(1),pyproject(0),setup_py(0),setup_cfg(0),requirements_txt(0)  # Represents a project to be analyzed.
+  weekly/core/report.py:
+    i: datetime,dataclasses.{asdict,dataclass,field},datetime.timezone,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: CheckResult,Report
+    CheckResult: __init__(7),to_dict(0),is_ok(0),name(0),name(1)  # Represents the result of a single check.
+    Report: __init__(1),add_result(1),get_suggestions(0),to_dict(0),to_json(1)  # Represents a report of project analys...
+  weekly/git_change_analyzer.py:
+    i: json,os,re,shlex,subprocess,datetime,__future__.annotations,dataclasses.{dataclass,field},datetime.timedelta
+    e: CommitInfo,ChangeSummary,GitChangeAnalyzer
+    CommitInfo:   # Information about a single commit.
+    ChangeSummary:   # Summary of changes in a repository.
+    GitChangeAnalyzer: __init__(1),_run_git(2),get_commits_since(1),_classify_commit(1),analyze_changes(1)  # Analyzes Git repository changes and g...
+  weekly/git_report.py:
+    i: json,datetime,__future__.annotations,dataclasses.{asdict,dataclass,field},pathlib.Path,typing.{Any,Dict,List}
+    e: RepoInfo,GitReportGenerator
+    RepoInfo:   # Repository information for reports.
+    GitReportGenerator: generate_llm_report(4),generate_markdown_report(4),generate_html_report(4),generate_summary_report(5),_render_html_template(2)  # Generates reports for Git repository...
+  weekly/git_scanner.py:
+    i: json,os,shlex,shutil,subprocess,sys,__future__.annotations,concurrent.futures.{ThreadPoolExecutor,as_completed},dataclasses.asdict
+    e: GitRepo,ScanResult,GitScanner
+    GitRepo: __post_init__(0),_extract_metadata(0),has_recent_changes(1),_run_git(1)  # Represents a Git repository with its...
+    ScanResult: __post_init__(0),to_dict(0)  # Represents the result of scanning a r...
+    GitScanner: __init__(5),find_git_repos(0),scan_repo(1),scan_all(0),_generate_repo_report(2)  # Scans Git repositories and generates...

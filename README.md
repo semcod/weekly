@@ -372,3 +372,20 @@ Created by **Tom Sapletta** - [tom@sapletta.com](mailto:tom@sapletta.com)
 
 - Built with ❤️ by the WronAI team
 - Inspired by various Git analysis tools
+
+<!-- taskill:status:start -->
+
+## Status
+
+_Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:49 UTC_
+
+| Metric | Value |
+|---|---|
+| HEAD | `8545fd9` |
+| Coverage | 73.0% |
+| Failing tests | — |
+| Commits in last cycle | 21 |
+
+> Added a deep code analysis engine with seven supporting modules, introduced a CLI with validation and API hooks, and substantially improved test coverage and documentation. Several refactors and report-style improvements for LLM output were applied, and auto_update_config was disabled to preserve manual test strategy.
+
+<!-- taskill:status:end -->

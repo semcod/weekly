@@ -1,5 +1,3 @@
-# Przykład użycia raportu LLM do naprawy kodu
-
 ## Jak wygenerować raport LLM
 
 Raport LLM jest generowany automatycznie przy `weekly scan` jako plik `*.llm.md` obok standardowego `*.html` i `*.md`.

@@ -1,7 +1,6 @@
 """
 Testing checker for Weekly - checks for test configuration and coverage.
 """
-from pathlib import Path
 from typing import Optional
 
 from ..core.project import Project

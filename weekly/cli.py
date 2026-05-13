@@ -6,15 +6,13 @@ import json
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Optional
 
 import click
 from rich.console import Console
 
 from . import __version__
 from .core.analyzer import analyze_project
-from .core.project import Project
-from .core.report import Report
 from .git_scanner import GitScanner
 
 console = Console()

@@ -1,13 +1,9 @@
-# Kompletny przykład promptu dla LLM
-
 ## Prompt z użyciem raportu LLM:
 
 ```
 Jestem deweloperem Python pracującym nad projektem exef-pl/app. Potrzebuję pomocy w naprawie problemów z jakością kodu.
 
 Oto raport z analizy:
-
-# Weekly Report - exef-pl/app - LLM Code Fixing Report
 
 ## 🤖 LLM Instructions
 
@@ -84,14 +80,8 @@ Please provide:
 3. **Verification Steps** - How to confirm fixes worked
 4. **Backup Strategy** - Should we create a backup first?
 
-### Suggested Workflow:
-
-```bash
 # 1. Create a backup branch
 git checkout -b fix/code-quality
-
-# 2. Fix critical errors manually (if any)
-# [Edit files as needed]
 
 # 3. Apply formatting fixes
 cd /home/tom/github/exef-pl/app && black .
@@ -128,8 +118,6 @@ git commit -m 'fix: apply code formatting and linting fixes'
 
 Proszę o szczegółowy plan działania krok po kroku.
 ```
-
-## Kluczowe elementy dobrego promptu:
 
 ### ✅ **Struktura:**
 1. **Kontekst** - kim jesteś i nad czym pracujesz

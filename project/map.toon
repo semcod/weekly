@@ -1,0 +1,97 @@
+# weekly | 21f 5102L | python:21
+# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
+M[21]:
+  examples/git_scan_example.py,60
+  setup.py,11
+  weekly/__init__.py,65
+  weekly/checkers/__init__.py,27
+  weekly/checkers/base.py,71
+  weekly/checkers/ci_cd.py,236
+  weekly/checkers/code_quality.py,343
+  weekly/checkers/dependencies.py,366
+  weekly/checkers/docs.py,242
+  weekly/checkers/packaging.py,159
+  weekly/checkers/release_readiness.py,162
+  weekly/checkers/security.py,205
+  weekly/checkers/style.py,367
+  weekly/cli.py,327
+  weekly/core/analyzer.py,61
+  weekly/core/logger.py,48
+  weekly/core/project.py,153
+  weekly/core/report.py,221
+  weekly/git_change_analyzer.py,418
+  weekly/git_report.py,922
+  weekly/git_scanner.py,638
+D:
+  weekly/checkers/dependencies.py:
+    e: DependenciesChecker
+    DependenciesChecker(BaseChecker): check(1),_get_dependencies(1),_parse_dep_spec(1),_normalize_constraint(1),_find_unpinned_dependencies(1),_find_outdated_dependencies(1),_run_pip_audit(1)  # Checker for project dependencies...
+  weekly/git_report.py:
+    e: RepoInfo,GitReportGenerator
+    RepoInfo:  # Repository information for reports...
+    GitReportGenerator: generate_llm_report(3),generate_markdown_report(3),generate_html_report(3),generate_summary_report(4),_render_html_template(1),_render_repo_report(0),_render_summary_report(0)  # Generates reports for Git repository scans...
+  weekly/checkers/code_quality.py:
+    e: CodeQualityChecker
+    CodeQualityChecker(BaseChecker): check(1),_detect_formatters(1),_detect_linters(1),_detect_type_checkers(1),_find_common_issues(1),_get_dependencies(1)  # Checker for code style and quality...
+  weekly/git_scanner.py:
+    e: GitRepo,ScanResult,GitScanner
+    GitRepo: __post_init__(0),_extract_metadata(0),has_recent_changes(1),_run_git(1)  # Represents a Git repository with its metadata...
+    ScanResult: __post_init__(0),to_dict(0)  # Represents the result of scanning a repository...
+    GitScanner: __init__(5),find_git_repos(0),scan_repo(1),scan_all(0),_generate_repo_report(2),_generate_summary_report(1)  # Scans Git repositories and generates reports...
+  weekly/checkers/ci_cd.py:
+    e: CIChecker
+    CIChecker(BaseChecker): check(1),_detect_ci_config(1),_detect_cd_config(1),_has_testing_in_ci(2)  # Checker for CI/CD configuration...
+  weekly/checkers/release_readiness.py:
+    e: ReleaseReadinessChecker
+    ReleaseReadinessChecker(BaseChecker): check(1),_check_version_consistency(1),_check_changelog_status(2),_check_dist_files(1)  # Checker for release readiness...
+  weekly/checkers/docs.py:
+    e: DocumentationChecker
+    DocumentationChecker(BaseChecker): check(1),_check_readme(1),_check_license(1),_detect_license_type(1),_check_changelog(1),_check_contributing(1),_check_code_of_conduct(1),_check_api_docs(1)  # Checker for project documentation...
+  weekly/cli.py:
+    e: main,analyze,_format_text_output,_parse_since_date,scan
+    main()
+    analyze(project_path;output_format;output;show_suggestions;verbose)
+    _format_text_output(report;show_suggestions)
+    _parse_since_date(since_str)
+    scan(root_dir;output_dir;since_str;recursive;jobs;output_format;summary_only;verbose)
+  weekly/checkers/style.py:
+    e: StyleIssue,StyleChecker
+    StyleIssue: to_dict(0)  # Represents a style issue found in the codebase...
+    StyleChecker(BaseChecker): __init__(1),check(1),_run_black_check(1),_parse_black_output(1),_run_isort_check(1),_parse_isort_output(1),_run_flake8_check(1),_parse_flake8_output(1),_run_mypy_check(1),_parse_mypy_output(1),_generate_report(0),get_fix_commands(0)  # Checker for code style and formatting issues.
+
+This checker ...
+  examples/git_scan_example.py:
+    e: main
+    main()
+  weekly/git_change_analyzer.py:
+    e: CommitInfo,ChangeSummary,GitChangeAnalyzer
+    CommitInfo:  # Information about a single commit...
+    ChangeSummary:  # Summary of changes in a repository...
+    GitChangeAnalyzer: __init__(1),_run_git(2),get_commits_since(1),_classify_commit(1),analyze_changes(1),generate_changelog_with_git_cliff(2),generate_summary_report(1)  # Analyzes Git repository changes and generates changelogs...
+  weekly/checkers/packaging.py:
+    e: PackagingChecker
+    PackagingChecker(BaseChecker): check(1),_check_build_system(1),_check_metadata(1),_check_dist_config(1)  # Checker for project packaging and distribution metadata...
+  weekly/checkers/security.py:
+    e: SecurityChecker
+    SecurityChecker(BaseChecker): check(1),_detect_secrets(1),_detect_insecure_functions(1),_detect_insecure_files(1)  # Checker for security issues and secrets...
+  weekly/checkers/base.py:
+    e: CheckSeverity,BaseChecker
+    CheckSeverity(str,Enum):  # Enumeration of possible check severity levels...
+    BaseChecker(ABC): __init__(1),check(1),_get_file_content(1)  # Abstract base class for all project checkers...
+  weekly/core/analyzer.py:
+    e: analyze_project
+    analyze_project(project_path)
+  weekly/core/project.py:
+    e: Project
+    Project: __init__(1),get_file_content(1),_read_file(1)  # Represents a project to be analyzed...
+  weekly/core/report.py:
+    e: CheckResult,Report
+    CheckResult: __init__(7),to_dict(0),name(1),name(1)  # Represents the result of a single check...
+    Report: __init__(1),add_result(1),get_suggestions(0),to_dict(0),to_json(1),to_markdown(0)  # Represents a report of project analysis results...
+  weekly/core/logger.py:
+    e: get_logger,set_log_level
+    get_logger(name)
+    set_log_level(level)
+  weekly/__init__.py:
+  setup.py:
+  weekly/checkers/__init__.py:

@@ -1,0 +1,246 @@
+# code2llm | 20f 5042L | py:20 | 2026-03-08
+# CC̄=7.6 | critical:27/100 | dups:0 | cycles:0
+
+HEALTH[10]:
+  🟡 CC    _detect_cd_config CC=15 (limit:15)
+  🟡 CC    _check_version_consistency CC=15 (limit:15)
+  🟡 CC    _get_dependencies CC=54 (limit:15)
+  🟡 CC    check CC=18 (limit:15)
+  🟡 CC    _find_common_issues CC=39 (limit:15)
+  🟡 CC    check CC=15 (limit:15)
+  🟡 CC    _detect_license_type CC=15 (limit:15)
+  🟡 CC    generate_llm_report CC=48 (limit:15)
+  🟡 CC    __post_init__ CC=15 (limit:15)
+  🟡 CC    _generate_repo_report CC=31 (limit:15)
+
+REFACTOR[1]:
+  1. split 10 high-CC methods  (CC>15)
+
+COUPLING:
+                       weekly.core           weekly  weekly.checkers
+      weekly.core               ──               ←1               ←1
+           weekly                1               ──                 
+  weekly.checkers                1                                ──
+  CYCLES: none
+
+LAYERS:
+  weekly/                         CC̄=7.6    ←in:0  →out:1
+  │ !! git_report                 922L  2C    7m  CC=48     ←1
+  │ !! git_scanner                638L  3C   12m  CC=31     ←0
+  │ !  git_change_analyzer        418L  3C    7m  CC=11     ←0
+  │ !  style                      367L  2C   13m  CC=12     ←0
+  │ !! dependencies               366L  1C    7m  CC=54     ←0
+  │ !! code_quality               343L  1C    6m  CC=39     ←0
+  │ !  cli                        327L  0C    5m  CC=14     ←0
+  │ !! docs                       242L  1C    8m  CC=15     ←0
+  │ !! ci_cd                      236L  1C    4m  CC=15     ←0
+  │ report                     221L  2C    9m  CC=4      ←0
+  │ security                   205L  1C    4m  CC=8      ←0
+  │ !! release_readiness          162L  1C    4m  CC=15     ←0
+  │ packaging                  159L  1C    4m  CC=9      ←0
+  │ project                    153L  1C    3m  CC=4      ←0
+  │ base                        71L  2C    3m  CC=4      ←0
+  │ __init__                    65L  0C    0m  CC=0.0    ←0
+  │ analyzer                    61L  0C    1m  CC=4      ←1
+  │ logger                      48L  0C    2m  CC=2      ←1
+  │ __init__                    27L  0C    0m  CC=0.0    ←0
+  │
+  ./                              CC̄=0.0    ←in:0  →out:0
+  │ setup                       11L  0C    0m  CC=0.0    ←0
+  │
+
+DUPLICATES[0]: none
+
+FUNCTIONS (CC≥10, 27 of 99):
+   54.0  DependenciesChecker._get_dependencies      31n   2exit  loops+cond+ret  !! split
+   48.0  GitReportGenerator.generate_llm_report     54n   1exit  loops+cond  !! split
+   39.0  CodeQualityChecker._find_common_issues     36n   2exit  loops+cond+ret  !! split
+   31.0  GitScanner._generate_repo_report           34n   2exit  loops+cond+ret  !! split
+   18.0  CodeQualityChecker.check                   26n   3exit  cond+ret  !! split
+   15.0  CIChecker._detect_cd_config                21n   5exit  loops+cond+ret  !! split
+   15.0  ReleaseReadinessChecker._check_version_consistency   20n   2exit  loops+cond+ret  !! split
+   15.0  DocumentationChecker.check                 25n   6exit  cond+ret  !! split
+   15.0  DocumentationChecker._detect_license_type   22n   7exit  cond+ret  !! split
+   15.0  GitRepo.__post_init__                      16n   1exit  cond  !! split
+   14.0  _parse_since_date                           9n   3exit  loops+cond+ret
+   14.0  CodeQualityChecker._detect_formatters      21n   2exit  cond+ret
+   14.0  CodeQualityChecker._detect_linters         20n   2exit  loops+cond+ret
+   14.0  GitReportGenerator._render_repo_report     11n   2exit  loops+cond+ret
+   13.0  GitScanner.find_git_repos                  12n   3exit  loops+cond+ret
+   13.0  GitScanner._generate_summary_report        10n   3exit  loops+cond+ret
+   12.0  StyleChecker._parse_mypy_output             9n   1exit  loops+cond
+   11.0  CIChecker._has_testing_in_ci               17n   5exit  loops+cond+ret
+   11.0  ReleaseReadinessChecker.check              16n   3exit  cond+ret
+   11.0  GitChangeAnalyzer._classify_commit         19n   7exit  loops+cond+ret
+   11.0  GitReportGenerator.generate_markdown_report    9n   1exit  loops+cond
+   10.0  DependenciesChecker.check                  18n   7exit  cond+ret
+   10.0  DependenciesChecker._run_pip_audit          3n   2exit  ret
+   10.0  StyleChecker._parse_flake8_output           7n   1exit  loops+cond
+   10.0  StyleChecker._generate_report              12n   3exit  loops+cond+ret
+   10.0  GitChangeAnalyzer.get_commits_since        17n   3exit  loops+cond+ret
+   10.0  GitRepo._extract_metadata                   2n   1exit  
+
+  summary:
+    critical(≥10): 27 | high(5-10): 26 | medium(2-5): 29 | low(<2): 17
+    27% CC≥10  54% CC≥5
+
+HOTSPOTS:
+  #1  GitReportGenerator.generate_llm_report  fan=33   "GitReportGenerator method, fan-out=33"
+  #2  GitScanner._generate_repo_report     fan=32   "GitScanner method, fan-out=32"
+  #3  GitScanner.scan_repo                 fan=30   "GitScanner method, fan-out=30"
+  #4  CodeQualityChecker._find_common_issues  fan=26   "CodeQualityChecker method, fan-out=26"
+  #5  GitScanner.scan_all                  fan=19   "GitScanner method, fan-out=19"
+  #6  analyze                              fan=18   "analysis pipeline, 18 stages"
+  #7  GitChangeAnalyzer.get_commits_since  fan=16   "GitChangeAnalyzer method, fan-out=16"
+  #8  GitReportGenerator.generate_markdown_report  fan=16   "GitReportGenerator method, fan-out=16"
+  #9  scan                                 fan=15   "calls 15 functions"
+  #10 analyze_project                      fan=15   "analysis pipeline, 15 stages"
+
+CLASSES:
+  StyleChecker                   ████████████████████████  12m  CC̄=4.8   max=12  
+  DocumentationChecker           ████████████████           8m  CC̄=6.6   max=15    !!
+  DependenciesChecker            ██████████████             7m  CC̄=13.4  max=54    !!
+  GitChangeAnalyzer              ██████████████             7m  CC̄=6.6   max=11  
+  GitReportGenerator             ██████████████             7m  CC̄=12.6  max=48    !!
+  CodeQualityChecker             ████████████               6m  CC̄=15.8  max=39    !!
+  Report                         ████████████               6m  CC̄=2.5   max=4   
+  GitScanner                     ████████████               6m  CC̄=12.3  max=31    !!
+  CIChecker                      ████████                   4m  CC̄=10.5  max=15    !!
+  ReleaseReadinessChecker        ████████                   4m  CC̄=8.8   max=15    !!
+  SecurityChecker                ████████                   4m  CC̄=7.0   max=8   
+  PackagingChecker               ████████                   4m  CC̄=6.5   max=9   
+  CheckResult                    ████████                   4m  CC̄=1.5   max=3   
+  GitRepo                        ████████                   4m  CC̄=7.2   max=15    !!
+  BaseChecker                    ██████                     3m  CC̄=2.3   max=4   
+  Project                        ██████                     3m  CC̄=2.0   max=4   
+  ScanResult                     ████                       2m  CC̄=3.5   max=6   
+  StyleIssue                     ██                         1m  CC̄=1.0   max=1   
+  CheckSeverity                                             0m  CC̄=0.0   max=0.0 
+  CommitInfo                                                0m  CC̄=0.0   max=0.0 
+  ChangeSummary                                             0m  CC̄=0.0   max=0.0 
+  RepoInfo                                                  0m  CC̄=0.0   max=0.0 
+
+D:
+  weekly/checkers/dependencies.py:
+    e: DependenciesChecker
+    DependenciesChecker  # Checker for project dependencies....
+      check(1)  CC=10.0
+        → _get_dependencies(1)  CC=54.0  !
+        → _parse_dep_spec(1)  CC=7.0
+        → _normalize_constraint(1)  CC=5.0
+        → _find_unpinned_dependencies(1)  CC=7.0
+        → _run_pip_audit(1)  CC=10.0
+        → _find_outdated_dependencies(1)  CC=1.0
+  weekly/git_report.py:
+    e: RepoInfo,GitReportGenerator
+    RepoInfo  # Repository information for reports....
+    GitReportGenerator  # Generates reports for Git repository scans....
+      generate_llm_report(3)  CC=48.0  !
+  weekly/checkers/code_quality.py:
+    e: CodeQualityChecker
+    CodeQualityChecker  # Checker for code style and quality....
+      check(1)  CC=18.0  !
+        → _detect_formatters(1)  CC=14.0
+        → _get_dependencies(1)  CC=1.0
+        → _detect_linters(1)  CC=14.0
+        → _detect_type_checkers(1)  CC=9.0
+        → _find_common_issues(1)  CC=39.0  !
+  weekly/git_scanner.py:
+    e: GitRepo,ScanResult,GitScanner
+    GitRepo  # Represents a Git repository with its metadata....
+      __post_init__(0)  CC=15.0  !
+        → _extract_metadata(0)  CC=10.0
+        → _run_git(1)  CC=2.0
+    ScanResult  # Represents the result of scanning a repository....
+      __post_init__(0)  CC=1.0
+    GitScanner  # Scans Git repositories and generates reports....
+      __init__(5)  CC=2.0
+  weekly/checkers/ci_cd.py:
+    e: CIChecker
+    CIChecker  # Checker for CI/CD configuration....
+      check(1)  CC=8.0
+        → _detect_ci_config(1)  CC=8.0
+        → _detect_cd_config(1)  CC=15.0  !
+        → _has_testing_in_ci(2)  CC=11.0
+  weekly/checkers/release_readiness.py:
+    e: ReleaseReadinessChecker
+    ReleaseReadinessChecker  # Checker for release readiness....
+      check(1)  CC=11.0
+        → _check_version_consistency(1)  CC=15.0  !
+        → _check_changelog_status(2)  CC=5.0
+        → _check_dist_files(1)  CC=4.0
+  weekly/checkers/docs.py:
+    e: DocumentationChecker
+    DocumentationChecker  # Checker for project documentation....
+      check(1)  CC=15.0  !
+        → _check_readme(1)  CC=3.0
+        → _check_license(1)  CC=4.0
+        → _detect_license_type(1)  CC=15.0  !
+        → _check_changelog(1)  CC=3.0
+        → _check_contributing(1)  CC=3.0
+        → _check_code_of_conduct(1)  CC=3.0
+        → _check_api_docs(1)  CC=7.0
+  weekly/cli.py:
+    e: main,analyze,_format_text_output,_parse_since_date,scan
+    main()
+    analyze(project_path,output_format,output,show_suggestions,verbose)
+    _format_text_output(report,show_suggestions)
+    _parse_since_date(since_str)
+    scan(root_dir,output_dir,since_str,recursive,jobs,output_format,summary_only,verbose)
+  weekly/checkers/style.py:
+    e: StyleIssue,StyleChecker
+    StyleIssue  # Represents a style issue found in the codebase....
+      to_dict(0)  CC=1.0
+    StyleChecker  # Checker for code style and formatting issues.
+
+This checker ...
+      __init__(1)  CC=1.0
+        → __init__(1)  CC=1.0
+  examples/git_scan_example.py:
+    e: main
+    main()
+  weekly/git_change_analyzer.py:
+    e: CommitInfo,ChangeSummary,GitChangeAnalyzer
+    CommitInfo  # Information about a single commit....
+    ChangeSummary  # Summary of changes in a repository....
+    GitChangeAnalyzer  # Analyzes Git repository changes and generates changelogs....
+      __init__(1)  CC=1.0
+  weekly/checkers/packaging.py:
+    e: PackagingChecker
+    PackagingChecker  # Checker for project packaging and distribution metadata....
+      check(1)  CC=7.0
+        → _check_build_system(1)  CC=3.0
+        → _check_metadata(1)  CC=9.0
+        → _check_dist_config(1)  CC=7.0
+  weekly/checkers/security.py:
+    e: SecurityChecker
+    SecurityChecker  # Checker for security issues and secrets....
+      check(1)  CC=7.0
+        → _detect_secrets(1)  CC=8.0
+        → _detect_insecure_functions(1)  CC=8.0
+        → _detect_insecure_files(1)  CC=5.0
+  weekly/checkers/base.py:
+    e: CheckSeverity,BaseChecker
+    CheckSeverity  # Enumeration of possible check severity levels....
+    BaseChecker  # Abstract base class for all project checkers....
+      __init__(1)  CC=2.0
+  weekly/core/analyzer.py:
+    e: analyze_project
+    analyze_project(project_path)
+  weekly/core/project.py:
+    e: Project
+    Project  # Represents a project to be analyzed....
+      __init__(1)  CC=1.0
+  weekly/core/report.py:
+    e: CheckResult,Report
+    CheckResult  # Represents the result of a single check....
+      __init__(7)  CC=3.0
+    Report  # Represents a report of project analysis results....
+      __init__(1)  CC=1.0
+  weekly/core/logger.py:
+    e: get_logger,set_log_level
+    get_logger(name)
+    set_log_level(level)
+  weekly/__init__.py:
+  setup.py:
+  weekly/checkers/__init__.py:

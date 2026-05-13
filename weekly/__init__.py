@@ -11,8 +11,6 @@ try:
 except Exception:
     pass
 
-from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 # Import checkers
 from .checkers.base import BaseChecker

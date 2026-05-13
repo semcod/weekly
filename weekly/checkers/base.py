@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from ..core.logger import get_logger
-from ..core.project import Project
 from ..core.report import CheckResult
 
 if TYPE_CHECKING:

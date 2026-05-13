@@ -1,14 +1,11 @@
 """Style and formatting checker for Python projects."""
 from __future__ import annotations
 
-import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from rich.console import Console
-from rich.panel import Panel
 from rich.table import Table
 
 from weekly.checkers.base import BaseChecker, CheckResult, CheckSeverity

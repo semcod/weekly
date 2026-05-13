@@ -64,8 +64,6 @@ weekly scan /path/to/repositories --since "2023-01-01"
 weekly scan /path/to/repositories --since "30 days ago"
 ```
 
-## Output Options
-
 ### Output Directory
 
 By default, reports are saved in the `./weekly-reports` directory. You can specify a custom output directory:
@@ -96,8 +94,6 @@ If you only want the summary report and not individual reports for each reposito
 ```bash
 weekly scan /path/to/repositories --summary-only
 ```
-
-## Examples
 
 ### Basic Scan
 
@@ -214,8 +210,6 @@ For large repositories or many repositories, you can:
    ```bash
    weekly scan /path/to/repositories --summary-only
    ```
-
-## Troubleshooting
 
 ### No repositories found
 

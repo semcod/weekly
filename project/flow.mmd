@@ -1,0 +1,131 @@
+flowchart TD
+    subgraph examples_git_scan_example
+        examples__git_scan_example__main("main CC=11")
+    end
+    subgraph weekly_checkers
+        weekly__checkers__base__BaseChecker____init__["__init__"]
+        weekly__checkers__base__BaseChecker__check["check"]
+        weekly___get_file_content["_get_file_content"]
+        weekly__checkers__ci_cd__CIChecker__check("check CC=8")
+        weekly___detect_ci_config("_detect_ci_config CC=8")
+        weekly___detect_cd_config{{_detect_cd_config CC=15}}
+        weekly___has_testing_in_ci("_has_testing_in_ci CC=11")
+        weekly__check("check CC=11")
+        weekly___check_version_consistency{{_check_version_consistency CC=15}}
+        weekly___check_changelog_status["_check_changelog_status"]
+        weekly___check_dist_files["_check_dist_files"]
+        weekly__checkers__security__SecurityChecker__check["check"]
+        weekly___detect_secrets("_detect_secrets CC=8")
+        weekly___detect_insecure_functions("_detect_insecure_functions CC=8")
+        weekly___detect_insecure_files["_detect_insecure_files"]
+        weekly__check["check"]
+        weekly___check_build_system["_check_build_system"]
+        weekly___check_metadata("_check_metadata CC=9")
+        weekly___check_dist_config["_check_dist_config"]
+        weekly__check("check CC=10")
+        weekly___get_dependencies{{_get_dependencies CC=54}}
+        weekly___parse_dep_spec["_parse_dep_spec"]
+        weekly___normalize_constraint["_normalize_constraint"]
+        weekly___find_unpinned_dependencies["_find_unpinned_dependencies"]
+        weekly___find_outdated_dependencies["_find_outdated_dependencies"]
+        weekly___run_pip_audit("_run_pip_audit CC=10")
+        weekly__check{{check CC=18}}
+        weekly___detect_formatters("_detect_formatters CC=14")
+        weekly___detect_linters("_detect_linters CC=14")
+        weekly___detect_type_checkers("_detect_type_checkers CC=9")
+        weekly___find_common_issues{{_find_common_issues CC=39}}
+        weekly___get_dependencies["_get_dependencies"]
+        weekly__checkers__style__StyleIssue__to_dict["to_dict"]
+        weekly__checkers__style__StyleChecker____init__["__init__"]
+        weekly__checkers__style__StyleChecker__check["check"]
+        weekly___run_black_check["_run_black_check"]
+        weekly___parse_black_output["_parse_black_output"]
+        weekly___run_isort_check["_run_isort_check"]
+        weekly___parse_isort_output["_parse_isort_output"]
+        weekly___run_flake8_check["_run_flake8_check"]
+        weekly___parse_flake8_output("_parse_flake8_output CC=10")
+        weekly___run_mypy_check["_run_mypy_check"]
+        weekly___parse_mypy_output("_parse_mypy_output CC=12")
+        weekly___generate_report("_generate_report CC=10")
+        weekly__get_fix_commands["get_fix_commands"]
+        weekly__check{{check CC=15}}
+        weekly___check_readme["_check_readme"]
+        weekly___check_license["_check_license"]
+        weekly___detect_license_type{{_detect_license_type CC=15}}
+        weekly___check_changelog["_check_changelog"]
+        weekly___check_contributing["_check_contributing"]
+        weekly___check_code_of_conduct["_check_code_of_conduct"]
+        weekly___check_api_docs["_check_api_docs"]
+    end
+    subgraph weekly_cli
+        weekly__cli__main["main"]
+        weekly__cli__analyze("analyze CC=9")
+        weekly__cli___format_text_output("_format_text_output CC=9")
+        weekly__cli___parse_since_date("_parse_since_date CC=14")
+        weekly__cli__scan("scan CC=8")
+    end
+    subgraph weekly_core
+        weekly__core__analyzer__analyze_project["analyze_project"]
+        weekly__core__project__Project____init__["__init__"]
+        weekly__core__project__Project__get_file_content["get_file_content"]
+        weekly__core__project__Project___read_file["_read_file"]
+        weekly__core__report__CheckResult____init__["__init__"]
+        weekly__core__report__CheckResult__to_dict["to_dict"]
+        weekly__core__report__CheckResult__name["name"]
+        weekly__core__report__Report____init__["__init__"]
+        weekly__core__report__Report__add_result["add_result"]
+        weekly__core__report__Report__get_suggestions["get_suggestions"]
+        weekly__core__report__Report__to_dict["to_dict"]
+        weekly__core__report__Report__to_json["to_json"]
+        weekly__core__report__Report__to_markdown["to_markdown"]
+        weekly__core__logger__get_logger["get_logger"]
+        weekly__core__logger__set_log_level["set_log_level"]
+    end
+    subgraph weekly_git_change_analyzer
+        weekly____init__["__init__"]
+        weekly___run_git["_run_git"]
+        weekly__get_commits_since("get_commits_since CC=10")
+        weekly___classify_commit("_classify_commit CC=11")
+        weekly__analyze_changes("analyze_changes CC=9")
+        weekly__generate_changelog_with_git_cliff("generate_changelog_with_git_cliff CC=8")
+        weekly__generate_summary_report["generate_summary_report"]
+    end
+    subgraph weekly_git_report
+        weekly__generate_llm_report{{generate_llm_report CC=48}}
+        weekly__generate_markdown_report("generate_markdown_report CC=11")
+        weekly__generate_html_report["generate_html_report"]
+        weekly__generate_summary_report["generate_summary_report"]
+        weekly___render_html_template["_render_html_template"]
+        weekly___render_repo_report("_render_repo_report CC=14")
+        weekly___render_summary_report["_render_summary_report"]
+    end
+    subgraph weekly_git_scanner
+        weekly__git_scanner__GitRepo____post_init__{{__post_init__ CC=15}}
+        weekly__git_scanner__GitRepo___extract_metadata("_extract_metadata CC=10")
+        weekly__git_scanner__GitRepo__has_recent_changes["has_recent_changes"]
+        weekly__git_scanner__GitRepo___run_git["_run_git"]
+        weekly__git_scanner__ScanResult____post_init__["__post_init__"]
+        weekly__git_scanner__ScanResult__to_dict["to_dict"]
+        weekly__git_scanner__GitScanner____init__["__init__"]
+        weekly__git_scanner__GitScanner__find_git_repos("find_git_repos CC=13")
+        weekly__git_scanner__GitScanner__scan_repo("scan_repo CC=8")
+        weekly__git_scanner__GitScanner__scan_all["scan_all"]
+        weekly___generate_repo_report{{_generate_repo_report CC=31}}
+        weekly___generate_summary_report("_generate_summary_report CC=13")
+    end
+    weekly__cli__analyze --> weekly__core__analyzer__analyze_project
+    weekly__cli__scan --> weekly__cli___parse_since_date
+    weekly__checkers__base__BaseChecker____init__ --> weekly__core__logger__get_logger
+    weekly__generate_html_report --> weekly__generate_markdown_report
+    weekly__generate_html_report --> weekly__generate_llm_report
+    weekly__generate_html_report --> weekly___render_html_template
+    weekly__generate_summary_report --> weekly___render_html_template
+    weekly___render_html_template --> weekly___render_repo_report
+    weekly___render_html_template --> weekly___render_summary_report
+    weekly___generate_repo_report --> weekly__generate_html_report
+    weekly___generate_summary_report --> weekly__generate_summary_report
+
+    classDef highCC fill:#ff6b6b,stroke:#c92a2a,color:#fff
+    classDef medCC fill:#ffd43b,stroke:#f08c00,color:#000
+    class weekly___detect_cd_config,weekly___check_version_consistency,weekly___get_dependencies,weekly__check,weekly___find_common_issues,weekly__check,weekly___detect_license_type,weekly__generate_llm_report,weekly__git_scanner__GitRepo____post_init__,weekly___generate_repo_report highCC
+    class examples__git_scan_example__main,weekly__cli__analyze,weekly__cli___format_text_output,weekly__cli___parse_since_date,weekly__cli__scan,weekly__checkers__ci_cd__CIChecker__check,weekly___detect_ci_config,weekly___has_testing_in_ci,weekly__check,weekly___detect_secrets,weekly___detect_insecure_functions,weekly___check_metadata,weekly__check,weekly___run_pip_audit,weekly___detect_formatters,weekly___detect_linters,weekly___detect_type_checkers,weekly___parse_flake8_output,weekly___parse_mypy_output,weekly___generate_report,weekly__get_commits_since,weekly___classify_commit,weekly__analyze_changes,weekly__generate_changelog_with_git_cliff,weekly__generate_markdown_report,weekly___render_repo_report,weekly__git_scanner__GitRepo___extract_metadata,weekly__git_scanner__GitScanner__find_git_repos,weekly__git_scanner__GitScanner__scan_repo,weekly___generate_summary_report medCC

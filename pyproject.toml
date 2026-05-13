@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "weekly"
-version = "0.1.41"
+version = "0.1.42"
 description = "A comprehensive Python project quality analyzer that automatically detects issues in code style, documentation, CI/CD, and dependencies, providing actionable next steps and detailed reports."
 authors = [
     "Tom Sapletta <tom@sapletta.com>"

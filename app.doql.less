@@ -1,0 +1,239 @@
+// LESS format — define @variables here as needed
+
+app {
+  name: Untitled;
+  version: 0.1.41;
+}
+
+workflow[name="install"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Installing package in development mode...${RESET}";
+  step-2: run cmd=poetry install --with dev;
+}
+
+workflow[name="install-prod"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Installing production dependencies...${RESET}";
+  step-2: run cmd=poetry install --only main;
+}
+
+workflow[name="test"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Running tests...${RESET}";
+  step-2: run cmd=${PYTEST} -v $(ARGS) tests/;
+}
+
+workflow[name="test-cov"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Running tests with coverage...${RESET}";
+  step-2: run cmd=${PYTEST} -v --cov=${PACKAGE} --cov-report=term-missing --cov-report=xml --cov-report=html tests/;
+}
+
+workflow[name="lint"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Running linters...${RESET}";
+  step-2: run cmd=${BLACK} --check ${PACKAGE} tests/;
+  step-3: run cmd=${ISORT} --check-only ${PACKAGE} tests/;
+  step-4: run cmd=${FLAKE8} ${PACKAGE} tests/;
+}
+
+workflow[name="format"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Formatting code...${RESET}";
+  step-2: run cmd=${BLACK} ${PACKAGE} tests/;
+  step-3: run cmd=${ISORT} ${PACKAGE} tests/;
+}
+
+workflow[name="format-check"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Checking code formatting...${RESET}";
+  step-2: run cmd=${BLACK} --check ${PACKAGE} tests/;
+  step-3: run cmd=${ISORT} --check-only ${PACKAGE} tests/;
+}
+
+workflow[name="typecheck"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Running type checking...${RESET}";
+  step-2: run cmd=${MYPY} ${PACKAGE} tests/;
+}
+
+workflow[name="check"] {
+  trigger: manual;
+  step-1: depend target=lint;
+  step-2: depend target=format-check;
+  step-3: depend target=typecheck;
+  step-4: depend target=test;
+}
+
+workflow[name="clean"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Cleaning...${RESET}";
+  step-2: run cmd=rm -rf \;
+  step-3: run cmd=.pytest_cache/ \;
+  step-4: run cmd=.mypy_cache/ \;
+  step-5: run cmd=.coverage \;
+  step-6: run cmd=.coverage.* \;
+  step-7: run cmd=coverage.xml \;
+  step-8: run cmd=htmlcov/ \;
+  step-9: run cmd=dist/ \;
+  step-10: run cmd=build/ \;
+  step-11: run cmd=*.egg-info/ \;
+  step-12: run cmd=__pycache__/ \;
+  step-13: run cmd=*/__pycache__/ \;
+  step-14: run cmd=*/*/__pycache__/ \;
+  step-15: run cmd=.python-version \;
+  step-16: run cmd=.mypy_cache \;
+  step-17: run cmd=.pytest_cache \;
+  step-18: run cmd=.eggs \;
+  step-19: run cmd=.tox;
+}
+
+workflow[name="build"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Building package...${RESET}";
+  step-2: run cmd=poetry build;
+}
+
+workflow[name="publish"] {
+  trigger: manual;
+  step-1: run cmd=#@echo "${YELLOW}Publishing to PyPI...${RESET}";
+  step-2: run cmd=poetry version patch;
+  step-3: run cmd=poetry publish --build;
+}
+
+workflow[name="docs"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Building documentation...${RESET}";
+  step-2: run cmd=poetry run mkdocs build;
+}
+
+workflow[name="serve"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Serving documentation at http://localhost:8000${RESET}";
+  step-2: run cmd=poetry run mkdocs serve;
+}
+
+workflow[name="pre-commit"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Installing pre-commit hooks...${RESET}";
+  step-2: run cmd=poetry run pre-commit install;
+}
+
+workflow[name="bump-version"] {
+  trigger: manual;
+  step-1: run cmd=if [ -z "$(PART)" ]; then \;
+  step-2: run cmd=echo "${YELLOW}Error: PART variable not set. Usage: make bump-version PART=<major|minor|patch>${RESET}"; \;
+  step-3: run cmd=exit 1; \;
+  step-4: run cmd=fi;
+  step-5: run cmd=echo "${YELLOW}Bumping $(PART) version...${RESET}";
+  step-6: run cmd=poetry version $(PART);
+  step-7: run cmd=git add pyproject.toml;
+  step-8: run cmd=git commit -m "Bump version to $(shell poetry version -s)";
+  step-9: run cmd=git tag -a v$(shell poetry version -s) -m "Version $(shell poetry version -s)";
+  step-10: run cmd=echo "${GREEN}Version bumped to $(shell poetry version -s)${RESET}";
+}
+
+workflow[name="safety"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Checking for security vulnerabilities...${RESET}";
+  step-2: run cmd=poetry run safety check --full-report;
+}
+
+workflow[name="dep-update"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Updating dependencies...${RESET}";
+  step-2: run cmd=poetry update;
+}
+
+workflow[name="info"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Package Information:${RESET}";
+  step-2: run cmd=poetry version;
+  step-3: run cmd=echo "\n${YELLOW}Dependencies:${RESET}";
+  step-4: run cmd=poetry show --tree;
+}
+
+workflow[name="release"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Creating release...${RESET}";
+  step-2: run cmd=git push origin main --tags;
+  step-3: run cmd=poetry publish --build;
+}
+
+workflow[name="scan"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Running weekly scan...${RESET}";
+  step-2: run cmd=poetry run weekly scan $(ROOT) -o $(OUT);
+}
+
+workflow[name="scan-since"] {
+  trigger: manual;
+  step-1: run cmd=echo "${YELLOW}Running weekly scan with since filter...${RESET}";
+  step-2: run cmd=poetry run weekly scan $(ROOT) -o $(OUT) --since "$(SINCE)";
+}
+
+workflow[name="fmt"] {
+  trigger: manual;
+  step-1: run cmd=ruff format .;
+}
+
+workflow[name="help"] {
+  trigger: manual;
+  step-1: run cmd=echo "";
+  step-2: run cmd=echo "${YELLOW}Usage:${RESET} make ${GREEN}<target>${RESET}";
+  step-3: run cmd=echo "";
+  step-4: run cmd=echo "${YELLOW}Available targets:${RESET}";
+  step-5: run cmd=echo "  ${GREEN}install${RESET}       - Install package in development mode with all dependencies";
+  step-6: run cmd=echo "  ${GREEN}install-prod${RESET}   - Install only production dependencies";
+  step-7: run cmd=echo "  ${GREEN}test${RESET}          - Run tests";
+  step-8: run cmd=echo "  ${GREEN}test-cov${RESET}      - Run tests with coverage report";
+  step-9: run cmd=echo "  ${GREEN}lint${RESET}          - Run all linters (black, isort, flake8)";
+  step-10: run cmd=echo "  ${GREEN}format${RESET}        - Format code";
+  step-11: run cmd=echo "  ${GREEN}format-check${RESET}  - Check code formatting";
+  step-12: run cmd=echo "  ${GREEN}typecheck${RESET}     - Run static type checking";
+  step-13: run cmd=echo "  ${GREEN}check${RESET}         - Run all checks (lint, format-check, typecheck, test)";
+  step-14: run cmd=echo "  ${GREEN}clean${RESET}         - Remove build artifacts and cache";
+  step-15: run cmd=echo "  ${GREEN}build${RESET}         - Build package";
+  step-16: run cmd=echo "  ${GREEN}publish${RESET}       - Publish package to PyPI";
+  step-17: run cmd=echo "  ${GREEN}docs${RESET}          - Build documentation";
+  step-18: run cmd=echo "  ${GREEN}serve${RESET}         - Serve documentation locally";
+  step-19: run cmd=echo "  ${GREEN}pre-commit${RESET}    - Install pre-commit hooks";
+  step-20: run cmd=echo "  ${GREEN}bump-version${RESET}  - Bump version (make bump-version PART=patch)";
+  step-21: run cmd=echo "  ${GREEN}safety${RESET}        - Check for security vulnerabilities";
+  step-22: run cmd=echo "  ${GREEN}dep-update${RESET}    - Update dependencies";
+  step-23: run cmd=echo "  ${GREEN}info${RESET}          - Show package information";
+  step-24: run cmd=echo "  ${GREEN}release${RESET}       - Create a new release (tag and publish)";
+  step-25: run cmd=echo "  ${GREEN}help${RESET}          - Show this help message";
+}
+
+workflow[name="health"] {
+  trigger: manual;
+  step-1: run cmd=docker compose ps;
+  step-2: run cmd=docker compose exec app echo "Health check passed";
+}
+
+workflow[name="import-makefile-hint"] {
+  trigger: manual;
+  step-1: run cmd=echo 'Run: taskfile import Makefile to import existing targets.';
+}
+
+workflow[name="all"] {
+  trigger: manual;
+  step-1: run cmd=taskfile run install;
+  step-2: run cmd=taskfile run lint;
+  step-3: run cmd=taskfile run test;
+}
+
+workflow[name="analyze"] {
+  trigger: manual;
+  step-1: run cmd=echo "🔬 Running project analysis...";
+  step-2: run cmd=weekly analyze . --tools code2llm,redup,vallm;
+}
+
+deploy {
+  target: makefile;
+}
+
+environment[name="local"] {
+  runtime: python;
+}

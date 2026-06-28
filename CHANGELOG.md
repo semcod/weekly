@@ -224,6 +224,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - refactor(report): improve LLM report formatting and style
 - refactor(docs): commit message generator and code relationship mapping
 
+## [0.1.43] - 2026-06-29
+
+### Docs
+- Update README.md
+
+### Other
+- Update .env.example
+- Update VERSION
+
 ## [0.1.3] - 2025-06-07
 
 ### Added

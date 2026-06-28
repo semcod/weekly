@@ -271,21 +271,21 @@ strategies:
       --benchmark-zipkin --benchmark-opentelemetry --benchmark-gatling --benchmark-jmeter
       --benchmark-k6 --benchmark-locust --benchmark-artillery
     build: poetry build
-    publish: poetry build && poetry publish
+    publish: twine upload dist/weekly-{version}*
     dependencies:
       file: requirements.txt
       lock: pip freeze > requirements.txt
   nodejs:
     test: npm test
     build: npm run build
-    publish: npm publish
+    publish: twine upload dist/weekly-{version}*
     dependencies:
       file: package-lock.json
       lock: npm install
   rust:
     test: cargo test
     build: cargo build --release
-    publish: cargo publish
+    publish: twine upload dist/weekly-{version}*
     dependencies:
       file: Cargo.lock
       lock: cargo update

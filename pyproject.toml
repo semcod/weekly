@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "weekly"
-version = "0.1.42"
+version = "0.1.43"
 description = "A comprehensive Python project quality analyzer that automatically detects issues in code style, documentation, CI/CD, and dependencies, providing actionable next steps and detailed reports."
 authors = [
     "Tom Sapletta <tom@sapletta.com>"
@@ -23,7 +23,6 @@ keywords = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
 ]
 
 [tool.poetry.dependencies]
@@ -151,3 +150,32 @@ ignore = ["E501", "W503", "E203"]
 [metadata]
 license = "Apache-2.0"
 license_files = ["LICENSE", "NOTICE"]
+
+[tool.pfix]
+# Self-healing Python configuration
+model = "openrouter/qwen/qwen3-coder-next"
+auto_apply = true
+auto_install_deps = true
+auto_restart = false
+max_retries = 3
+create_backups = false
+git_auto_commit = false
+
+[tool.pfix.runtime_todo]
+enabled = true
+todo_file = "TODO.md"
+min_severity = "low"
+deduplicate = true
+
+[tool.costs]
+# AI Cost tracking configuration
+badge = true
+update_readme = true
+readme_path = "README.md"
+default_model = "openrouter/qwen/qwen3-coder-next"
+analysis_mode = "byok"
+full_history = true
+max_commits = 500
+
+# Cost thresholds for badge colors (USD)
+badge_color_thresholds = { low = 1.0, medium = 5.0, high = 10.0, critical = 50.0 }

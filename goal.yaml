@@ -224,52 +224,7 @@ git:
     format: '{prefix}{version}'
 strategies:
   python:
-    test: poetry run pytest --no-cov -q --tb=short -v --disable-warnings --color=yes
-      --maxfail=1 --strict-markers --override-ini="addopts=" --confcutdir= --ignore=
-      --deselect= --ff --nf --last-failed --new-first --cache-clear --runxfail --pdb
-      --trace --verbose --debug --setup-only --setup-plan --fixtures --fixture-db
-      --collect-only --help --version --basetemp= --assert= --capture= --import-mode=
-      --junit-xml= --log-cli= --log-file= --markers= --minversion= --override-ini=
-      --password= --project= --pyargs= --quiet --rootdir= --show-capture= --showlocals
-      --stepwise --skip --sw --stepwise-skip --x --exitfirst --continue-on-collection-errors
-      --lfnf= --last-failed-no-failures --cache-show --override-ini= --report= --tb=
-      --timeout= --print-log --co --count --dist= --numprocesses= --max-slave-restart=
-      --rs --randomly --randomly-dont-shuffle --reuse-db --create-db --db --typeguard
-      --benchmark --benchmark-only --benchmark-sort= --benchmark-gpu --benchmark-cprofile
-      --benchmark-mem --benchmark-warmup --benchmark-autosave --benchmark-only --benchmark-disable-gc
-      --benchmark-skip --benchmark-save --benchmark-load --benchmark-json --benchmark-csv
-      --benchmark-html --benchmark-include --benchmark-exclude --benchmark-columns
-      --benchmark-timer --benchmark-histogram --benchmark-calibrate --benchmark-only
-      --benchmark-round --benchmark-min-rounds --benchmark-max-time --benchmark-warmup
-      --benchmark-name --benchmark-xmin --benchmark-xmax --benchmark-ymin --benchmark-ymax
-      --benchmark-log --benchmark-precision --benchmark-sort --benchmark-group --benchmark-group-by
-      --benchmark-datetime --benchmark-legacy --benchmark-storage --benchmark-elastic
-      --benchmark-mongo --benchmark-aws --benchmark-azure --benchmark-gcp --benchmark-k8s
-      --benchmark-openshift --benchmark-prometheus --benchmark-grafana --benchmark-datadog
-      --benchmark-newrelic --benchmark-splunk --benchmark-jenkins --benchmark-circleci
-      --benchmark-travis --benchmark-github --benchmark-gitlab --benchmark-bitbucket
-      --benchmark-azure-devops --benchmark-bamboo --benchmark-teamcity --benchmark-octopus
-      --benchmark-ansible --benchmark-terraform --benchmark-docker --benchmark-kubernetes
-      --benchmark-helm --benchmark-istio --benchmark-prometheus-operator --benchmark-fluentd
-      --benchmark-loki --benchmark-jaeger --benchmark-zipkin --benchmark-opentelemetry
-      --benchmark-gatling --benchmark-jmeter --benchmark-k6 --benchmark-locust --benchmark-artillery
-      --benchmark-vegeta --benchmark-hey --benchmark-wrk --benchmark-httperf --benchmark-siege
-      --benchmark-ab --benchmark-beeswithmachineguns --benchmark-funkload --benchmark-pylot
-      --benchmark-tsunami --benchmark-sb --benchmark-grinder --benchmark-ngrinder
-      --benchmark-ycsb --benchmark-rally --benchmark-iperf --benchmark-netperf --benchmark-sysbench
-      --benchmark-db --benchmark-mongo --benchmark-redis --benchmark-cassandra --benchmark-neo4j
-      --benchmark-elasticsearch --benchmark-solr --benchmark-opensearch --benchmark-meilisearch
-      --benchmark-pinecone --benchmark-weaviate --benchmark-qdrant --benchmark-chroma
-      --benchmark-lancedb --benchmark-milvus --benchmark-vectordb --benchmark-pgvecto
-      --benchmark-clickhouse --benchmark-timescaledb --benchmark-influxdb --benchmark-prometheus
-      --benchmark-grafana --benchmark-datadog --benchmark-newrelic --benchmark-splunk
-      --benchmark-jenkins --benchmark-circleci --benchmark-travis --benchmark-github
-      --benchmark-gitlab --benchmark-bitbucket --benchmark-azure-devops --benchmark-bamboo
-      --benchmark-teamcity --benchmark-octopus --benchmark-ansible --benchmark-terraform
-      --benchmark-docker --benchmark-kubernetes --benchmark-helm --benchmark-istio
-      --benchmark-prometheus-operator --benchmark-fluentd --benchmark-loki --benchmark-jaeger
-      --benchmark-zipkin --benchmark-opentelemetry --benchmark-gatling --benchmark-jmeter
-      --benchmark-k6 --benchmark-locust --benchmark-artillery
+    test: poetry run pytest -q
     build: poetry build
     publish: twine upload dist/weekly-{version}*
     dependencies:

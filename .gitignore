@@ -87,3 +87,7 @@ reports/
 .Trashes
 ehthumbs.db
 Thumbs.db
+.code2llm_cache/
+.github/
+.mypy_cache/
+.taskill/
